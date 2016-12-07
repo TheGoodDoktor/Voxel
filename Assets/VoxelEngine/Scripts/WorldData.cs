@@ -18,10 +18,14 @@ public class WorldData
 	
 	// this list is used to store a list of dirty chunks - this will be used to rebuild the voxel meshes
 	private List<Chunk>	m_DirtyChunks = new List<Chunk>();
+
+	// public properties
+	public IntVec3 WorldSizeChunks { get { return m_WorldSizeChunks;}}
+	public IntVec3 ChunkSizeBlocks { get { return m_ChunkSizeBlocks;}}
 	
 	public WorldData()
 	{
-		m_OutsideBlock.m_Type = BlockType.Air;
+		m_OutsideBlock.m_Type = BlockType.Air;	// block used to return invalid types etc.
 	}
 
 	public void InitChunks()
