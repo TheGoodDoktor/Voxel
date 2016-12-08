@@ -28,6 +28,12 @@ public class WorldData
 		m_OutsideBlock.m_Type = BlockType.Air;	// block used to return invalid types etc.
 	}
 
+    public void SetDimensions(IntVec3 worldSize, IntVec3 chunkSize)
+    {
+        m_WorldSizeChunks = worldSize;
+        m_ChunkSizeBlocks = chunkSize;
+    } 
+
 	public void InitChunks()
 	{
 		m_Chunks = new Chunk[m_WorldSizeChunks.x,m_WorldSizeChunks.y,m_WorldSizeChunks.z];
@@ -64,10 +70,16 @@ public class WorldData
 		else
 			return chunk.Blocks[blockX, blockY, blockZ];
     }
-	
-	// Set a block in the world with optional dirty maring
-	// position is passed in as voxel world coords
-	public void SetBlock(IntVec3 pos, Block block, bool bMarkDirty = true)
+
+    public void SetBlock(IntVec3 pos, BlockType block, bool bMarkDirty = true)
+    {
+        Block newBlock = new Block();
+        SetBlock(pos, newBlock,bMarkDirty);
+    }
+
+    // Set a block in the world with optional dirty maring
+    // position is passed in as voxel world coords
+        public void SetBlock(IntVec3 pos, Block block, bool bMarkDirty = true)
 	{
 		if(PosOutsideWorld(pos))
 			return;
@@ -93,35 +105,61 @@ public class WorldData
 		}
 		
 		chunk.Blocks[blockX, blockY, blockZ] = block;
-		
-		// Mark block dirty and process surrounding blocks if needed
-		if(bMarkDirty)
-		{
-			if(chunk.MarkDirty())
-				m_DirtyChunks.Add(chunk);
-			
-			// If we set a block on the chunk edge set neigbouring chunk as dirty
-			if(blockX == 0 && chunkX > 0)
-			{
-				Chunk neighbour = m_Chunks[chunkX - 1, chunkY, chunkZ];
-				if(neighbour != null && neighbour.MarkDirty())
-					m_DirtyChunks.Add(neighbour);
-			}
-			
-			if(blockX == m_ChunkSizeBlocks.x - 1 && chunkX < m_WorldSizeChunks.x - 1)
-			{
-				Chunk neighbour = m_Chunks[chunkX + 1, chunkY, chunkZ];
-				if(neighbour != null && neighbour.MarkDirty())
-					m_DirtyChunks.Add(neighbour);
-			}
-			
-			// TODO: Y neigbours
-			
-			// TODO: Z neigbours
-			
-		}
-			
-	}
+
+        // Mark block dirty and process surrounding blocks if needed
+        if (!bMarkDirty)
+            return;
+        
+        if (chunk.MarkDirty())
+            m_DirtyChunks.Add(chunk);
+
+        // If we set a block on the chunk edge set neigbouring chunk as dirty
+        if (blockX == 0 && chunkX > 0)
+        {
+            Chunk neighbour = m_Chunks[chunkX - 1, chunkY, chunkZ];
+            if (neighbour != null && neighbour.MarkDirty())
+                m_DirtyChunks.Add(neighbour);
+        }
+
+        if (blockX == m_ChunkSizeBlocks.x - 1 && chunkX < m_WorldSizeChunks.x - 1)
+        {
+            Chunk neighbour = m_Chunks[chunkX + 1, chunkY, chunkZ];
+            if (neighbour != null && neighbour.MarkDirty())
+                m_DirtyChunks.Add(neighbour);
+        }
+
+        //  Y neigbours
+        if (blockY == 0 && chunkY > 0)
+        {
+            Chunk neighbour = m_Chunks[chunkX, chunkY - 1, chunkZ];
+            if (neighbour != null && neighbour.MarkDirty())
+                m_DirtyChunks.Add(neighbour);
+        }
+
+        if (blockY == m_ChunkSizeBlocks.y - 1 && chunkY < m_WorldSizeChunks.y - 1)
+        {
+            Chunk neighbour = m_Chunks[chunkX, chunkY + 1, chunkZ];
+            if (neighbour != null && neighbour.MarkDirty())
+                m_DirtyChunks.Add(neighbour);
+        }
+
+        // Z neigbours
+        if (blockZ == 0 && chunkZ > 0)
+        {
+            Chunk neighbour = m_Chunks[chunkX, chunkY, chunkZ - 1];
+            if (neighbour != null && neighbour.MarkDirty())
+                m_DirtyChunks.Add(neighbour);
+        }
+
+        if (blockZ == m_ChunkSizeBlocks.z - 1 && chunkZ < m_WorldSizeChunks.z - 1)
+        {
+            Chunk neighbour = m_Chunks[chunkX, chunkY, chunkZ + 1];
+            if (neighbour != null && neighbour.MarkDirty())
+                m_DirtyChunks.Add(neighbour);
+        }
+
+
+    }
 }
 
-}
+}//namespace Voxel

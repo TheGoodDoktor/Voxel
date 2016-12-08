@@ -72,9 +72,71 @@ public class MeshBuilder
                             0.5f, chunk, index, blockType, BlockFace.Side, lightAmount);
             index += 4;
         }
-        // TODO: build mesh for each face
+            // west block
+            blockType = m_WorldData.GetBlock(new IntVec3(blockX - 1, blockY, blockZ)).m_Type;
+            if (blockType != BlockType.Air)
+            {
+                AddBlockFace(new IntVec3(x, y, z),
+                             new IntVec3(x, y, z + 1),
+                             new IntVec3(x, y + 1, z + 1),
+                             new IntVec3(x, y + 1, z), 
+                             0.8f, chunk, index, blockType, BlockFace.Side, lightAmount);
+                index += 4;
+            }
 
-        return index;
+            // north side
+            blockType = m_WorldData.GetBlock(new IntVec3(blockX, blockY + 1, blockZ)).m_Type;
+            if (blockType != BlockType.Air)
+            {
+                AddBlockFace(new IntVec3(x, y + 1, z),
+                             new IntVec3(x, y + 1, z + 1),
+                             new IntVec3(x + 1, y + 1, z + 1),
+                             new IntVec3(x + 1, y + 1, z),
+                             0.9f, chunk, index, blockType, BlockFace.Side, lightAmount);
+
+                index += 4;
+            }
+
+            // East side
+            blockType = m_WorldData.GetBlock(new IntVec3(blockX + 1, blockY, blockZ)).m_Type;
+            if (blockType != BlockType.Air)
+            {
+                AddBlockFace(new IntVec3(x + 1, y + 1,z), 
+                            new IntVec3(x + 1, y + 1,z + 1),  
+                            new IntVec3(x + 1, y,z + 1), 
+                            new IntVec3(x + 1, y, z), 
+                            0.7f, chunk, index, blockType, BlockFace.Side, lightAmount);
+
+                index += 4;
+            }
+
+            // Block above
+            blockType = m_WorldData.GetBlock(new IntVec3(blockX, blockY, blockZ + 1)).m_Type;
+            if (blockType != BlockType.Air)
+            {
+                AddBlockFace(new IntVec3(x + 1, y,z + 1), 
+                            new IntVec3(x + 1, y + 1,z + 1), 
+                            new IntVec3(x, y + 1,z + 1), 
+                            new IntVec3(x, y, z + 1), 
+                            0.4f, chunk, index, blockType, BlockFace.Bottom, lightAmount);
+
+                index += 4;
+            }
+
+            // Block below
+            blockType = m_WorldData.GetBlock(new IntVec3(blockX, blockY, blockZ - 1)).m_Type;
+            if (blockType != BlockType.Air)
+            {
+                AddBlockFace(new IntVec3(x, y,z),
+                            new IntVec3(x, y + 1,z),
+                            new IntVec3(x + 1, y + 1,z),
+                            new IntVec3(x + 1, y, z),
+                             1.0f, chunk, index, blockType, BlockFace.Top, lightAmount);
+
+                index += 4;
+            }
+
+            return index;
     }
 
 	// Add a face to the chunk

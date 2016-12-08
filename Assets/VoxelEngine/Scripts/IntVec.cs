@@ -2,6 +2,7 @@
 using UnityEngine;
 
 // general purpose integer Vector3
+[System.Serializable]
 public struct IntVec3
 {
 	public IntVec3(int vx,int vy,int vz)
