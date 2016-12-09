@@ -37,7 +37,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657868, g: 0.4964127, b: 0.57481724, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -118,14 +118,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbf3f31e2c9514bc4b86a27c8f363612, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_WorldSize:
-    x: 16
-    y: 16
-    z: 16
-  m_ChunkSize:
+  m_BlockSize: 1
+  m_WorldSizeChunks:
+    x: 2
+    y: 2
+    z: 2
+  m_ChunkSizeBlocks:
     x: 32
     y: 32
     z: 32
+  m_ChunkPrefab: {fileID: 1175765423642062, guid: 110a2cb7fb37e7449b9c1883b761ba55,
+    type: 2}
 --- !u!4 &199659170
 Transform:
   m_ObjectHideFlags: 0
@@ -135,8 +138,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 912660365}
+  m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -227,48 +229,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &912660364
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 912660365}
-  - component: {fileID: 912660366}
-  m_Layer: 0
-  m_Name: TestChunk
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &912660365
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 912660364}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 199659170}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &912660366
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 912660364}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 49730fa2d599840d0bd9fdb93ad0d2bb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Shader: {fileID: 7, guid: 0000000000000000f000000000000000, type: 0}
-  Texture: {fileID: 10305, guid: 0000000000000000f000000000000000, type: 0}
 --- !u!1 &984202468
 GameObject:
   m_ObjectHideFlags: 0
