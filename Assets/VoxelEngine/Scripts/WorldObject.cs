@@ -50,13 +50,19 @@ namespace Voxel
             m_ChunkRoot = new GameObject("ChunkRoot");
             m_ChunkRoot.transform.parent = transform;
 
-            // Test
-            //m_WorldData.SetBlock(new IntVec3(0, 0, 0), BlockType.Solid);
-            m_WorldData.SetBlock(new IntVec3(1, 1, 1), BlockType.Solid);
-
-            //CreateChunkObjects();
+            TestFillVoxels();
         }
 
+        void TestFillVoxels()
+        {
+           // Test
+            m_WorldData.SetBlock(new IntVec3(0, 0, 0), BlockType.Solid);
+            m_WorldData.SetBlock(new IntVec3(1, 1, 1), BlockType.Solid);
+            m_WorldData.SetBlock(new IntVec3(1, 2, 1), BlockType.Solid);
+            m_WorldData.SetBlock(new IntVec3(2, 2, 2), BlockType.Solid);
+        }
+
+        // Handler for when new chunk is created
         void OnNewChunk(Chunk chunk)
         {
             Vector3 chunkPos = m_WorldMin + new Vector3(chunk.WorldPos.x * m_BlockSize, chunk.WorldPos.y * m_BlockSize, chunk.WorldPos.z * m_BlockSize);
@@ -68,29 +74,6 @@ namespace Voxel
             chunk.GameObject = newChunkGameObj.GetComponent<ChunkObject>();
         }
 
-        void CreateChunkObjects()
-        {
-            //Build chunk objects under root from Prefab
-            Vector3 chunkPos = m_WorldMin;
-            for (int x = 0; x < m_WorldSizeChunks.x; x++)
-            {
-                for (int y = 0; y < m_WorldSizeChunks.y; y++)
-                {
-                    for (int z = 0; z < m_WorldSizeChunks.z; z++)
-                    {
-                        // Create new chunk and place in hierachy
-                        GameObject newChunk = GameObject.Instantiate(m_ChunkPrefab, chunkPos, new Quaternion());
-                        newChunk.name = string.Format("Chunk {0}{1}{2}", x.ToString(), y.ToString(), z.ToString());
-                        newChunk.transform.parent = m_ChunkRoot.transform;
-                        chunkPos += new Vector3(0,0,m_ChunkSize.z);
-                    }
-                    chunkPos += new Vector3(0,m_ChunkSize.y,0);
-                }
-
-                chunkPos += new Vector3(m_ChunkSize.y,0,0);
-            }
-        }
-	
 	    // Update is called once per frame
 	    void Update ()
         {

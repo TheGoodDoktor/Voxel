@@ -13,6 +13,7 @@ using UnityEngine;
 namespace Voxel
 {
 
+    // TODO: inherit from interface class
     public class MeshBuilder
     {
 	    private WorldData 	m_WorldData;	// voxel world data - needed because we need to look outside current chunk
@@ -40,7 +41,7 @@ namespace Voxel
                 for (int y = 0; y < m_WorldData.ChunkSizeBlocks.y; y++)
                 {
                     int blockY = (chunk.WorldPos.y * m_WorldData.ChunkSizeBlocks.y) + y;
-                    for (int z = 1; z < m_WorldData.ChunkSizeBlocks.z - 1; z++)
+                    for (int z = 0; z < m_WorldData.ChunkSizeBlocks.z; z++)
                     {
                         int blockZ = (chunk.WorldPos.z * m_WorldData.ChunkSizeBlocks.z) + z;
                         // x,y,z is co-ord of block inside chunk
@@ -52,6 +53,7 @@ namespace Voxel
 	    }
 
         // Buid the mesh for a given block within a chunk
+        // TODO: Fix this up
         private int BuildMeshForBlock(int blockX, int blockY, int blockZ, int x, int y, int z, Chunk chunk, int index)
         {
             Block currentBlock = chunk.Blocks[x, y, z];
@@ -62,7 +64,7 @@ namespace Voxel
 
             byte lightAmount = 255;//currentBlock.LightAmount;
 
-            // "South" side
+            // Below
             BlockType blockType = m_WorldData.GetBlock(new IntVec3(blockX, blockY - 1, blockZ)).m_Type;
 
             if (blockType != BlockType.Air)
@@ -76,7 +78,7 @@ namespace Voxel
                 index += 4;
             }
 
-            // west block
+            // West
             blockType = m_WorldData.GetBlock(new IntVec3(blockX - 1, blockY, blockZ)).m_Type;
             if (blockType != BlockType.Air)
             {
@@ -88,7 +90,7 @@ namespace Voxel
                 index += 4;
             }
 
-            // north side
+            // Above
             blockType = m_WorldData.GetBlock(new IntVec3(blockX, blockY + 1, blockZ)).m_Type;
             if (blockType != BlockType.Air)
             {
@@ -101,7 +103,7 @@ namespace Voxel
                 index += 4;
             }
 
-            // East side
+            // East 
             blockType = m_WorldData.GetBlock(new IntVec3(blockX + 1, blockY, blockZ)).m_Type;
             if (blockType != BlockType.Air)
             {
@@ -114,7 +116,7 @@ namespace Voxel
                 index += 4;
             }
 
-            // Block above
+            // North
             blockType = m_WorldData.GetBlock(new IntVec3(blockX, blockY, blockZ + 1)).m_Type;
             if (blockType != BlockType.Air)
             {
@@ -127,7 +129,7 @@ namespace Voxel
                 index += 4;
             }
 
-            // Block below
+            // South
             blockType = m_WorldData.GetBlock(new IntVec3(blockX, blockY, blockZ - 1)).m_Type;
             if (blockType != BlockType.Air)
             {
@@ -162,13 +164,13 @@ namespace Voxel
             chunk.Colours.Add(item);
             chunk.Colours.Add(item);
 
-            chunk.Indices.Add(index + 0);
+            chunk.Indices.Add(index + 2);
             chunk.Indices.Add(index + 1);
-            chunk.Indices.Add(index + 2);
-
-            chunk.Indices.Add(index + 2);
-            chunk.Indices.Add(index + 3);
             chunk.Indices.Add(index + 0);
+
+            chunk.Indices.Add(index + 0);
+            chunk.Indices.Add(index + 3);
+            chunk.Indices.Add(index + 2);
 
 		    // TODO: Sort out UV generation
 		    // we might want to use texture arrays but will probably start off with atlases
