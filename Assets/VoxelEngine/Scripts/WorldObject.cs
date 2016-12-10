@@ -30,6 +30,7 @@ namespace Voxel
             // Init world data
             m_WorldData.SetDimensions(m_WorldSizeChunks, m_ChunkSizeBlocks);
             m_WorldData.InitChunks();
+            m_WorldData.OnNewChunk += OnNewChunk;
 
             // Calc world dimensions
             m_WorldBlockSize = new IntVec3(
@@ -43,19 +44,33 @@ namespace Voxel
             m_WorldMin = Vector3.zero - (m_WorldSize * 0.5f);
             m_WorldMax = m_WorldMin + m_WorldSize;
 
-            m_MeshBuilder = new MeshBuilder(m_WorldData);
-            // Test
-            m_WorldData.SetBlock(new IntVec3(0, 0, 0), BlockType.Solid);
+            m_MeshBuilder = new MeshBuilder(m_WorldData, m_BlockSize);
 
-            CreateChunkObjects();
-	    }
-
-        void CreateChunkObjects()
-        {
+            // Hierachy
             m_ChunkRoot = new GameObject("ChunkRoot");
             m_ChunkRoot.transform.parent = transform;
 
-            // TODO: build chunk objects under root from Prefab
+            // Test
+            //m_WorldData.SetBlock(new IntVec3(0, 0, 0), BlockType.Solid);
+            m_WorldData.SetBlock(new IntVec3(1, 1, 1), BlockType.Solid);
+
+            //CreateChunkObjects();
+        }
+
+        void OnNewChunk(Chunk chunk)
+        {
+            Vector3 chunkPos = m_WorldMin + new Vector3(chunk.WorldPos.x * m_BlockSize, chunk.WorldPos.y * m_BlockSize, chunk.WorldPos.z * m_BlockSize);
+            GameObject newChunkGameObj = GameObject.Instantiate(m_ChunkPrefab, chunkPos, new Quaternion());
+
+            newChunkGameObj.name = string.Format("Chunk {0}", chunk.ChunkPos.ToString());
+            newChunkGameObj.transform.parent = m_ChunkRoot.transform;
+
+            chunk.GameObject = newChunkGameObj.GetComponent<ChunkObject>();
+        }
+
+        void CreateChunkObjects()
+        {
+            //Build chunk objects under root from Prefab
             Vector3 chunkPos = m_WorldMin;
             for (int x = 0; x < m_WorldSizeChunks.x; x++)
             {
@@ -77,9 +92,17 @@ namespace Voxel
         }
 	
 	    // Update is called once per frame
-	    void Update () {
-		
-	    }
+	    void Update ()
+        {
+            // TODO: Check world data for dirty chunks & rebuild them
+            var dirtyChunks = m_WorldData.DirtyChunks;
+            foreach(var chunk in dirtyChunks)
+            {
+                m_MeshBuilder.BuildMeshFromChunk(chunk);
+                chunk.GameObject.CreateMeshFromChunk(chunk);
+            }
+            dirtyChunks.Clear();
+        }
     }
 
 }//namespace Voxel

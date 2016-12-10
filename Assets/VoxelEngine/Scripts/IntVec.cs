@@ -16,6 +16,11 @@ public struct IntVec3
 	{
 		return new Vector3(x,y,z);
 	}
-	
-	public int x,y,z;
+
+    public override string ToString()
+    {
+        return string.Format("{0},{1},{2}", x.ToString(), y.ToString(), z.ToString());
+    }
+
+    public int x,y,z;
 }
