@@ -88,8 +88,11 @@ namespace Voxel
         public void SetBlock(IntVec3 pos, Block block, bool bMarkDirty = true)
 	    {
 		    if(PosOutsideWorld(pos))
-			    return;
-		
+            {
+                Debug.Log("SetBlock failed point outside world: " + pos.ToString());
+                return;
+            }
+			  
 		    // calc chunk and block coords
 		    int chunkX = pos.x / m_ChunkSizeBlocks.x;
             int chunkY = pos.y / m_ChunkSizeBlocks.y;
@@ -104,7 +107,7 @@ namespace Voxel
 		    // (we could check against setting air as block type and early out ?)
 		    if(chunk == null)	
 		    {
-			    chunk = new Chunk(new IntVec3(chunkX * m_ChunkSizeBlocks.x,chunkY * m_ChunkSizeBlocks.y,chunkZ * m_ChunkSizeBlocks.z));
+			    chunk = new Chunk(this,new IntVec3(chunkX * m_ChunkSizeBlocks.x,chunkY * m_ChunkSizeBlocks.y,chunkZ * m_ChunkSizeBlocks.z));
                 chunk.ChunkPos = new IntVec3(chunkX, chunkY, chunkZ);
 			    chunk.InitBlocks(m_ChunkSizeBlocks);
                 OnNewChunk(chunk);  // call event

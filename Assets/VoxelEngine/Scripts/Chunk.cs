@@ -7,8 +7,9 @@ namespace Voxel
 
     public class Chunk
     {
-	    public Chunk(IntVec3 pos)
+	    public Chunk(WorldData world,IntVec3 pos)
 	    {
+			m_World = world;
 		    m_WorldPos = pos;
 	    }
 	
@@ -32,7 +33,7 @@ namespace Voxel
 	    {
 		    if(m_bDirty == true)
 		    {
-			    OnChunkRebuilt(this);
+			    //OnChunkRebuilt(this);
 			    m_bDirty = false;
 		    }
 	    }
@@ -42,6 +43,7 @@ namespace Voxel
 	    public IntVec3 WorldPos {get{return m_WorldPos;}}
 	    public IntVec3 ChunkPos { get { return m_ChunkPos; } set { m_ChunkPos = value; } }
         public ChunkObject GameObject { get { return m_ChunkGameObject; } set { m_ChunkGameObject = value; } }
+		public WorldData World { get{return m_World;}}
 
         // Event Handling
         public delegate void ChunkDelegate(Chunk chk);	// multi-purpose delegate that passes in this chunk
@@ -55,7 +57,7 @@ namespace Voxel
         private IntVec3     m_ChunkPos;     // position of chunk in world chunk grid 
         private ChunkObject  m_ChunkGameObject;  // Unity game object that represents the chunk containing render mesh & collision
 	    private Block[,,] 	m_BlockData;	// 3d array of blocks
-	
+		private WorldData	m_World;		// Which world the chunk bleongs to
 	    // Mesh Data
 	    // These will be filled up and then written out to Unity mesh filters
 	    // this is here for convienience and may not be the best design

@@ -7,19 +7,16 @@ using UnityEngine;
 // typically one instance wil be instantiated in the world and it will be passed a series of chunks
 // which need meshes built. As well as initially creating meshes it will also update a current chunk mesh
 
-// Future ideas
-// We could create a mesh builder interface have various mesh builders for greedy mesh, marching cubes etc.
+// This is a basic builder which builds polys for externally facing block faces
 
 namespace Voxel
 {
-
-    // TODO: inherit from interface class
-    public class MeshBuilder
+    public class BasicMeshBuilder : IMeshBuilder
     {
 	    private WorldData 	m_WorldData;	// voxel world data - needed because we need to look outside current chunk
         private float       m_BlockSize;    // Size of block unit         
 	
-	    public MeshBuilder(WorldData worldData, float blockSize)
+	    public BasicMeshBuilder(WorldData worldData, float blockSize)
 	    {
 		    m_WorldData = worldData;
             m_BlockSize = blockSize;
@@ -53,7 +50,6 @@ namespace Voxel
 	    }
 
         // Buid the mesh for a given block within a chunk
-        // TODO: Fix this up
         private int BuildMeshForBlock(int blockX, int blockY, int blockZ, int x, int y, int z, Chunk chunk, int index)
         {
             Block currentBlock = chunk.Blocks[x, y, z];

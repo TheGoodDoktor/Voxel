@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace Voxel
 {
-
     public class WorldObject : MonoBehaviour
     {
         public float m_BlockSize = 1.0f;
@@ -13,9 +12,11 @@ namespace Voxel
         public GameObject m_ChunkPrefab;
 
         private WorldData m_WorldData = new WorldData();
-        private MeshBuilder m_MeshBuilder;
+        private IMeshBuilder m_MeshBuilder;
 
         private GameObject m_ChunkRoot;
+
+        private static WorldObject m_Instance;
 
         // World Dimensions
         private IntVec3 m_WorldBlockSize;
@@ -23,6 +24,13 @@ namespace Voxel
         private Vector3 m_WorldSize;
         private Vector3 m_WorldMin;
         private Vector3 m_WorldMax;
+
+        public static WorldObject Instance { get{ return m_Instance;}}
+
+        void Awake()
+        {
+            m_Instance = this;
+        }
 
         // Use this for initialization
         void Start ()
@@ -44,7 +52,9 @@ namespace Voxel
             m_WorldMin = Vector3.zero - (m_WorldSize * 0.5f);
             m_WorldMax = m_WorldMin + m_WorldSize;
 
-            m_MeshBuilder = new MeshBuilder(m_WorldData, m_BlockSize);
+            // Create a basic mesh builder
+            // TODO: use a specified mesh builder?
+            m_MeshBuilder = new BasicMeshBuilder(m_WorldData, m_BlockSize);
 
             // Hierachy
             m_ChunkRoot = new GameObject("ChunkRoot");
@@ -86,6 +96,45 @@ namespace Voxel
             }
             dirtyChunks.Clear();
         }
+
+        // functions to get & set voxels at world positions
+        public Block GetBlockAt(Vector3 worldPos)
+        {
+            worldPos -= m_WorldMin; // offset from origin
+
+            return m_WorldData.GetBlock(new IntVec3(
+                (int)(worldPos.x / m_BlockSize),
+                (int)(worldPos.y / m_BlockSize),
+                (int)(worldPos.z / m_BlockSize)
+            ));
+        }
+
+        
+        public void SetBlockAt(Vector3 worldPos,Block block)
+        {
+            worldPos -= m_WorldMin; // offset from origin
+
+            Debug.Log("Setting block at: " + worldPos.ToString());
+            
+            m_WorldData.SetBlock(new IntVec3(
+                (int)(worldPos.x / m_BlockSize),
+                (int)(worldPos.y / m_BlockSize),
+                (int)(worldPos.z / m_BlockSize)
+             ), block);
+        }
+
+        public Block GetBlockFromRaycastHit(RaycastHit hit)
+        {
+            Vector3 point = hit.point + (hit.normal * m_BlockSize * 0.5f);
+            return GetBlockAt(point);
+        }
+
+        public void SetBlockFromRaycastHit(RaycastHit hit, Block block)
+        {
+            Vector3 point = hit.point + (hit.normal * m_BlockSize * 0.5f);
+            SetBlockAt(point,block);
+        }
+
     }
 
 }//namespace Voxel

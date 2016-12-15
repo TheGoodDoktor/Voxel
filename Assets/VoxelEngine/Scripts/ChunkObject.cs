@@ -13,6 +13,10 @@ public class ChunkObject : MonoBehaviour
   	private MeshFilter m_MeshFilter;
     private MeshCollider m_MeshCollider;
     private MeshRenderer m_MeshRenderer;
+    private Chunk m_Chunk;  // which chunk we belong too
+
+    // public properties
+    public Chunk Chunk{ get{return m_Chunk;}}
 
 	// Use this for initialization
 	void Start () 
@@ -30,6 +34,8 @@ public class ChunkObject : MonoBehaviour
 	// Create the mesh from a chunk
 	public void CreateMeshFromChunk(Chunk chunk)
     {
+        m_Chunk = chunk;    // maybe change to a once only?
+
 		Debug.Log ("Creating Mesh For Chunk" + chunk.ToString());
         m_MeshFilter.mesh.Clear();
         m_MeshFilter.mesh.vertices = chunk.Vertices.ToArray();
@@ -43,6 +49,7 @@ public class ChunkObject : MonoBehaviour
         chunk.UVs = new List<Vector2>();
         chunk.Colours = new List<Color>();
         chunk.Indices = new List<int>();
+        chunk.MarkRebuilt();
     }
 }
 
