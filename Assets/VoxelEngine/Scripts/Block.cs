@@ -18,6 +18,8 @@ public enum BlockFace : byte
 public struct Block
 {
 	public BlockType m_Type;
+
+    public bool IsTransparent() {return m_Type == BlockType.Air;}
 }
 
 }

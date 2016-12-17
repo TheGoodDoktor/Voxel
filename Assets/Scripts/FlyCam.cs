@@ -51,13 +51,15 @@ public class FlyCam : MonoBehaviour {
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit))
 		{
-			// TODO: add block on mouse click
+			// add/remove blocks on mouse click
 			if (Input.GetMouseButtonDown(0))
 			{
-				Voxel.Block block;
-				block.m_Type = Voxel.BlockType.Solid;
-				Voxel.WorldObject.Instance.SetBlockFromRaycastHit(hit,block);
-				Debug.Log("Adding block at: " + hit.point.ToString());
+				Voxel.WorldObject.Instance.SetBlockInFrontOfRayHit(hit,Voxel.BlockType.Solid);
+			}
+
+			if (Input.GetMouseButtonDown(1))
+			{
+				Voxel.WorldObject.Instance.SetBlockBehindRayHit(hit,Voxel.BlockType.Air);
 			}
 			
 		}

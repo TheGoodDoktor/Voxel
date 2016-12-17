@@ -4,11 +4,12 @@ using UnityEngine;
 
 namespace Voxel
 {
-
+	// A chunk is a cubic subsection of the world
     public class Chunk
     {
 	    public Chunk(WorldData world,IntVec3 pos)
 	    {
+			// chunk needs to know which world it belongs to and its world position in voxel coords
 			m_World = world;
 		    m_WorldPos = pos;
 	    }
@@ -18,6 +19,7 @@ namespace Voxel
 		    m_BlockData = new Block[size.x,size.y,size.z];
 	    }	
 	
+		// chunk has been marked dirty indicating that its mesh needs rebuilding
 	    public bool MarkDirty()
 	    {
 		    if(m_bDirty == false)
@@ -44,12 +46,6 @@ namespace Voxel
 	    public IntVec3 ChunkPos { get { return m_ChunkPos; } set { m_ChunkPos = value; } }
         public ChunkObject GameObject { get { return m_ChunkGameObject; } set { m_ChunkGameObject = value; } }
 		public WorldData World { get{return m_World;}}
-
-        // Event Handling
-        public delegate void ChunkDelegate(Chunk chk);	// multi-purpose delegate that passes in this chunk
-
-	    public event ChunkDelegate		OnChunkBecameDirty;	// called when chunk becomes dirty
-	    public event ChunkDelegate		OnChunkRebuilt;		// called when chunk needs to be rebuilt
 
 	    // Private Data
 	    private bool		m_bDirty = false;	// Chunk is dirty

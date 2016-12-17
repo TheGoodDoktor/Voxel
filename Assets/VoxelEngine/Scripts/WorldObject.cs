@@ -13,6 +13,7 @@ namespace Voxel
 
         private WorldData m_WorldData = new WorldData();
         private IMeshBuilder m_MeshBuilder;
+        private IWorldBuilder m_WorldBuilder;
 
         private GameObject m_ChunkRoot;
 
@@ -60,7 +61,10 @@ namespace Voxel
             m_ChunkRoot = new GameObject("ChunkRoot");
             m_ChunkRoot.transform.parent = transform;
 
-            TestFillVoxels();
+            m_WorldBuilder = new TestWorldBuilder();
+            m_WorldBuilder.BuildWorld(m_WorldData);
+
+            //TestFillVoxels();
         }
 
         void TestFillVoxels()
@@ -110,7 +114,7 @@ namespace Voxel
         }
 
         
-        public void SetBlockAt(Vector3 worldPos,Block block)
+        public void SetBlockAt(Vector3 worldPos,BlockType blockType)
         {
             worldPos -= m_WorldMin; // offset from origin
 
@@ -120,7 +124,7 @@ namespace Voxel
                 (int)(worldPos.x / m_BlockSize),
                 (int)(worldPos.y / m_BlockSize),
                 (int)(worldPos.z / m_BlockSize)
-             ), block);
+             ), blockType);
         }
 
         public Block GetBlockFromRaycastHit(RaycastHit hit)
@@ -129,10 +133,16 @@ namespace Voxel
             return GetBlockAt(point);
         }
 
-        public void SetBlockFromRaycastHit(RaycastHit hit, Block block)
+        public void SetBlockInFrontOfRayHit(RaycastHit hit, BlockType blockType)
         {
             Vector3 point = hit.point + (hit.normal * m_BlockSize * 0.5f);
-            SetBlockAt(point,block);
+            SetBlockAt(point,blockType);
+        }
+
+        public void SetBlockBehindRayHit(RaycastHit hit, BlockType blockType)
+        {
+            Vector3 point = hit.point - (hit.normal * m_BlockSize * 0.5f);
+            SetBlockAt(point,blockType);
         }
 
     }

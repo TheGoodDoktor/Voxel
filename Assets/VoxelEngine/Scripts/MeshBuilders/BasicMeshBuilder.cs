@@ -32,21 +32,25 @@ namespace Voxel
             chunk.UVs = new List<Vector2>();
             chunk.Colours = new List<Color>();
 
+            Debug.Log("Building mesh for chunk at "+ chunk.WorldPos.ToString());
+
             for (int x = 0; x < m_WorldData.ChunkSizeBlocks.x; x++)
             {
-                int blockX = (chunk.WorldPos.x * m_WorldData.ChunkSizeBlocks.x) + x;
+                int blockX = chunk.WorldPos.x + x;
                 for (int y = 0; y < m_WorldData.ChunkSizeBlocks.y; y++)
                 {
-                    int blockY = (chunk.WorldPos.y * m_WorldData.ChunkSizeBlocks.y) + y;
+                    int blockY = chunk.WorldPos.y + y;
                     for (int z = 0; z < m_WorldData.ChunkSizeBlocks.z; z++)
                     {
-                        int blockZ = (chunk.WorldPos.z * m_WorldData.ChunkSizeBlocks.z) + z;
+                        int blockZ = chunk.WorldPos.z + z;
                         // x,y,z is co-ord of block inside chunk
                         // blockX,blockY,blockZ is co-ord of block in world
                         index = BuildMeshForBlock(blockX, blockY, blockZ, x, y, z, chunk, index);
                     }
                 }
             }
+
+            Debug.Log("Vertices: " + chunk.Vertices.Count);
 	    }
 
         // Buid the mesh for a given block within a chunk
@@ -54,86 +58,86 @@ namespace Voxel
         {
             Block currentBlock = chunk.Blocks[x, y, z];
 
-            // if it isn't an air block then bail because it won't have any faces to build
-            if ((currentBlock.m_Type != BlockType.Air))
+            // if it isn't a transparent block then bail because it won't have any faces to build
+            if ((currentBlock.IsTransparent() == false))
                 return index;
 
             byte lightAmount = 255;//currentBlock.LightAmount;
 
             // Below
-            BlockType blockType = m_WorldData.GetBlock(new IntVec3(blockX, blockY - 1, blockZ)).m_Type;
+            Block block = m_WorldData.GetBlock(new IntVec3(blockX, blockY - 1, blockZ));
 
-            if (blockType != BlockType.Air)
+            if (block.IsTransparent() == false)
             {
                 // The block is solid. Just add its info to the mesh,
                 // using our current air block's light amount for its lighting.
 
                 AddBlockFace(   new IntVec3(x + 1, y, z), new IntVec3(x + 1, y, z + 1),
                                 new IntVec3(x, y, z + 1), new IntVec3(x, y, z), 
-                                0.5f, chunk, index, blockType, BlockFace.Side, lightAmount);
+                                0.5f, chunk, index, block.m_Type, BlockFace.Side, lightAmount);
                 index += 4;
             }
 
             // West
-            blockType = m_WorldData.GetBlock(new IntVec3(blockX - 1, blockY, blockZ)).m_Type;
-            if (blockType != BlockType.Air)
+            block = m_WorldData.GetBlock(new IntVec3(blockX - 1, blockY, blockZ));
+            if (block.IsTransparent() == false)
             {
                 AddBlockFace(new IntVec3(x, y, z),
                                 new IntVec3(x, y, z + 1),
                                 new IntVec3(x, y + 1, z + 1),
                                 new IntVec3(x, y + 1, z), 
-                                0.8f, chunk, index, blockType, BlockFace.Side, lightAmount);
+                                0.8f, chunk, index, block.m_Type, BlockFace.Side, lightAmount);
                 index += 4;
             }
 
             // Above
-            blockType = m_WorldData.GetBlock(new IntVec3(blockX, blockY + 1, blockZ)).m_Type;
-            if (blockType != BlockType.Air)
+            block = m_WorldData.GetBlock(new IntVec3(blockX, blockY + 1, blockZ));
+            if (block.IsTransparent() == false)
             {
                 AddBlockFace(new IntVec3(x, y + 1, z),
                                 new IntVec3(x, y + 1, z + 1),
                                 new IntVec3(x + 1, y + 1, z + 1),
                                 new IntVec3(x + 1, y + 1, z),
-                                0.9f, chunk, index, blockType, BlockFace.Side, lightAmount);
+                                0.9f, chunk, index, block.m_Type, BlockFace.Side, lightAmount);
 
                 index += 4;
             }
 
             // East 
-            blockType = m_WorldData.GetBlock(new IntVec3(blockX + 1, blockY, blockZ)).m_Type;
-            if (blockType != BlockType.Air)
+            block = m_WorldData.GetBlock(new IntVec3(blockX + 1, blockY, blockZ));
+            if (block.IsTransparent() == false)
             {
                 AddBlockFace(new IntVec3(x + 1, y + 1,z), 
                             new IntVec3(x + 1, y + 1,z + 1),  
                             new IntVec3(x + 1, y,z + 1), 
                             new IntVec3(x + 1, y, z), 
-                            0.7f, chunk, index, blockType, BlockFace.Side, lightAmount);
+                            0.7f, chunk, index, block.m_Type, BlockFace.Side, lightAmount);
 
                 index += 4;
             }
 
             // North
-            blockType = m_WorldData.GetBlock(new IntVec3(blockX, blockY, blockZ + 1)).m_Type;
-            if (blockType != BlockType.Air)
+            block = m_WorldData.GetBlock(new IntVec3(blockX, blockY, blockZ + 1));
+            if (block.IsTransparent() == false)
             {
                 AddBlockFace(new IntVec3(x + 1, y,z + 1), 
                             new IntVec3(x + 1, y + 1,z + 1), 
                             new IntVec3(x, y + 1,z + 1), 
                             new IntVec3(x, y, z + 1), 
-                            0.4f, chunk, index, blockType, BlockFace.Bottom, lightAmount);
+                            0.4f, chunk, index, block.m_Type, BlockFace.Bottom, lightAmount);
 
                 index += 4;
             }
 
             // South
-            blockType = m_WorldData.GetBlock(new IntVec3(blockX, blockY, blockZ - 1)).m_Type;
-            if (blockType != BlockType.Air)
+            block = m_WorldData.GetBlock(new IntVec3(blockX, blockY, blockZ - 1));
+            if (block.IsTransparent() == false)
             {
                 AddBlockFace(new IntVec3(x, y,z),
                             new IntVec3(x, y + 1,z),
                             new IntVec3(x + 1, y + 1,z),
                             new IntVec3(x + 1, y, z),
-                                1.0f, chunk, index, blockType, BlockFace.Top, lightAmount);
+                                1.0f, chunk, index, block.m_Type, BlockFace.Top, lightAmount);
 
                 index += 4;
             }

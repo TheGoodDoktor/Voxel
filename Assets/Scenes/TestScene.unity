@@ -120,13 +120,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_BlockSize: 1
   m_WorldSizeChunks:
-    x: 2
-    y: 2
-    z: 2
+    x: 8
+    y: 8
+    z: 8
   m_ChunkSizeBlocks:
-    x: 32
-    y: 32
-    z: 32
+    x: 16
+    y: 16
+    z: 16
   m_ChunkPrefab: {fileID: 1175765423642062, guid: 110a2cb7fb37e7449b9c1883b761ba55,
     type: 2}
 --- !u!4 &199659170
