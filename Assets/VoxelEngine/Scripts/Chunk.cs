@@ -60,12 +60,14 @@ namespace Voxel
         private List<int> 		m_Indices = new List<int>();
         private List<Vector2> 	m_UVs = new List<Vector2>();
         private List<Vector3> 	m_Vertices = new List<Vector3>();
+        private List<Vector3>   m_Normals = new List<Vector3>();
         private List<Color> 	m_Colours = new List<Color>();
 	
 	    // property accessors
 	    public List<int> Indices 		{get{return m_Indices;} set{m_Indices = value;}}
 	    public List<Vector2> UVs		{get{return m_UVs;} set{m_UVs = value;}}
 	    public List<Vector3> Vertices	{get{return m_Vertices;} set{m_Vertices = value;}}
+	    public List<Vector3> Normals	{get{return m_Normals; } set{ m_Normals = value;}}
 	    public List<Color> Colours 		{get{return m_Colours;} set{m_Colours = value;}}
 
     }

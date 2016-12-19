@@ -5,14 +5,21 @@ namespace Voxel
 public enum BlockType : byte
 {
     Air = 0,
-	Solid = 1,
+	Solid,
+
+    Count
 }
 
 public enum BlockFace : byte
 {
     Top = 0,
-    Side = 1,
-    Bottom = 2
+    Bottom,
+    North,
+    South,
+    East,
+    West,
+
+    Count
 }
 
 public struct Block

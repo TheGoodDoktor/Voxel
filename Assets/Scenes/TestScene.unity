@@ -120,9 +120,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_BlockSize: 1
   m_WorldSizeChunks:
-    x: 8
-    y: 8
-    z: 8
+    x: 2
+    y: 2
+    z: 2
   m_ChunkSizeBlocks:
     x: 16
     y: 16
