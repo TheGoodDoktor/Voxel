@@ -70,10 +70,10 @@ namespace Voxel
         void TestFillVoxels()
         {
            // Test
-            m_WorldData.SetBlock(new IntVec3(0, 0, 0), BlockType.Solid);
-            m_WorldData.SetBlock(new IntVec3(1, 1, 1), BlockType.Solid);
-            m_WorldData.SetBlock(new IntVec3(1, 2, 1), BlockType.Solid);
-            m_WorldData.SetBlock(new IntVec3(2, 2, 2), BlockType.Solid);
+            m_WorldData.SetBlock(new IntVec3(0, 0, 0), (byte)BlockType.Solid);
+            m_WorldData.SetBlock(new IntVec3(1, 1, 1), (byte)BlockType.Solid);
+            m_WorldData.SetBlock(new IntVec3(1, 2, 1), (byte)BlockType.Solid);
+            m_WorldData.SetBlock(new IntVec3(2, 2, 2), (byte)BlockType.Solid);
         }
 
         // Handler for when new chunk is created
@@ -114,7 +114,7 @@ namespace Voxel
         }
 
         
-        public void SetBlockAt(Vector3 worldPos,BlockType blockType)
+        public void SetBlockAt(Vector3 worldPos,byte blockType)
         {
             worldPos -= m_WorldMin; // offset from origin
 
@@ -133,13 +133,13 @@ namespace Voxel
             return GetBlockAt(point);
         }
 
-        public void SetBlockInFrontOfRayHit(RaycastHit hit, BlockType blockType)
+        public void SetBlockInFrontOfRayHit(RaycastHit hit, byte blockType)
         {
             Vector3 point = hit.point + (hit.normal * m_BlockSize * 0.5f);
             SetBlockAt(point,blockType);
         }
 
-        public void SetBlockBehindRayHit(RaycastHit hit, BlockType blockType)
+        public void SetBlockBehindRayHit(RaycastHit hit, byte blockType)
         {
             Vector3 point = hit.point - (hit.normal * m_BlockSize * 0.5f);
             SetBlockAt(point,blockType);

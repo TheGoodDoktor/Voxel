@@ -6,7 +6,8 @@ namespace Voxel
 {
 	public class TestWorldBuilder : IWorldBuilder 
 	{
-		public void BuildWorld(WorldData world)
+        byte m_SolidBlock = (byte)BlockType.Solid;
+        public void BuildWorld(WorldData world)
 		{
 			IntVec3 size = world.WorldSizeBlocks;
 
@@ -16,7 +17,7 @@ namespace Voxel
 				{
 					int height = Random.Range(1,10);
 					for(int y=0;y<height;y++)
-						world.SetBlock(new IntVec3(x,y,z),BlockType.Solid);
+						world.SetBlock(new IntVec3(x,y,z), m_SolidBlock);   // TODO: 
 					
 				}
 			}

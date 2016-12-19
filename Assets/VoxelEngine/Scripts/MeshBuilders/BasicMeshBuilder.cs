@@ -154,7 +154,7 @@ namespace Voxel
 
 	    // Add a face to the chunk
 	    // This function could be in a base class if we need it for more mesh generators
-	    private void AddBlockFace(IntVec3 va, IntVec3 vb, IntVec3 vc, IntVec3 vd, float colour, Chunk chunk, int index, BlockType blockType,
+	    private void AddBlockFace(IntVec3 va, IntVec3 vb, IntVec3 vc, IntVec3 vd, float colour, Chunk chunk, int index, byte blockType,
                                   BlockFace blockFace,
                                   byte blockLight)
         {

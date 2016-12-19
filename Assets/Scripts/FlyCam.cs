@@ -11,8 +11,11 @@ public class FlyCam : MonoBehaviour {
 	private float m_RotationY = 0;
 	private Camera m_Camera;
 
-	// Use this for initialization
-	void Start () 
+    private byte m_BlockTypeAdd = (byte)Voxel.BlockType.Solid;
+    private byte m_BlockTypeRemove = (byte)Voxel.BlockType.Air;
+
+    // Use this for initialization
+    void Start () 
 	{
 		m_Camera = GetComponent<Camera>();
 		Cursor.lockState = CursorLockMode.Locked;
@@ -69,12 +72,12 @@ public class FlyCam : MonoBehaviour {
 			// add/remove blocks on mouse click
 			if (Input.GetMouseButtonDown(0))
 			{
-				Voxel.WorldObject.Instance.SetBlockInFrontOfRayHit(hit,Voxel.BlockType.Solid);
+				Voxel.WorldObject.Instance.SetBlockInFrontOfRayHit(hit,m_BlockTypeAdd);
 			}
 
 			if (Input.GetMouseButtonDown(1))
 			{
-				Voxel.WorldObject.Instance.SetBlockBehindRayHit(hit,Voxel.BlockType.Air);
+				Voxel.WorldObject.Instance.SetBlockBehindRayHit(hit, m_BlockTypeRemove);
 			}
 			
 		}
