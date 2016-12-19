@@ -10,6 +10,7 @@ namespace Voxel
         public IntVec3 m_WorldSizeChunks = new IntVec3(16, 16, 16);
         public IntVec3 m_ChunkSizeBlocks = new IntVec3(32, 32, 32);
         public GameObject m_ChunkPrefab;
+        public BlockInfoList m_BlockInfoList;
 
         private WorldData m_WorldData = new WorldData();
         private IMeshBuilder m_MeshBuilder;

@@ -37,7 +37,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657868, g: 0.4964127, b: 0.57481724, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -129,6 +129,7 @@ MonoBehaviour:
     z: 16
   m_ChunkPrefab: {fileID: 1175765423642062, guid: 110a2cb7fb37e7449b9c1883b761ba55,
     type: 2}
+  m_BlockInfoList: {fileID: 11400000, guid: 92182f88ee5507d4892fffff44a74628, type: 2}
 --- !u!4 &199659170
 Transform:
   m_ObjectHideFlags: 0

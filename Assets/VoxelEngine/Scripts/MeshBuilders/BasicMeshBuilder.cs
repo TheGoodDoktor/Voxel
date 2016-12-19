@@ -152,6 +152,15 @@ namespace Voxel
             return index;
         }
 
+        // Get the texture crop form the atlas for a given texture type
+        Rect GetTextureCropForBlockFace(byte blockType, BlockFace blockFace)
+        {
+            // TODO: Get from lookup, we might want a different side texture which is why the face is passed in
+            Rect worldTextureAtlasUv = new Rect(0, 0, 1, 1);
+
+            return worldTextureAtlasUv;
+        }
+
 	    // Add a face to the chunk
 	    // This function could be in a base class if we need it for more mesh generators
 	    private void AddBlockFace(IntVec3 va, IntVec3 vb, IntVec3 vc, IntVec3 vd, float colour, Chunk chunk, int index, byte blockType,
@@ -189,11 +198,8 @@ namespace Voxel
             chunk.Indices.Add(index + 3);
             chunk.Indices.Add(index + 2);
 
-		    // TODO: Sort out UV generation
-		    // we might want to use texture arrays but will probably start off with atlases
-		
-            Rect worldTextureAtlasUv = new Rect(0,0,1,1);   // TODO: get from atlas
-                //m_WorldData.BlockUVCoordinates[(int) blockType].BlockFaceUvCoordinates[(int) blockFace];
+            // Texture coords
+            Rect worldTextureAtlasUv = GetTextureCropForBlockFace(blockType,blockFace);
 
             chunk.UVs.Add(new Vector2(worldTextureAtlasUv.x + epsilon, worldTextureAtlasUv.y + epsilon));
             chunk.UVs.Add(new Vector2(worldTextureAtlasUv.x + epsilon,
