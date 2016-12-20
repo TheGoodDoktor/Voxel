@@ -56,7 +56,9 @@ namespace Voxel
 
             // Create a basic mesh builder
             // TODO: use a specified mesh builder?
-            m_MeshBuilder = new BasicMeshBuilder(m_WorldData, m_BlockSize);
+            //m_MeshBuilder = new BasicMeshBuilder(m_WorldData, m_BlockSize);
+            m_MeshBuilder = new MarchingCubesMeshBuilder(m_WorldData, m_BlockSize);
+            
 
             // Hierachy
             m_ChunkRoot = new GameObject("ChunkRoot");
