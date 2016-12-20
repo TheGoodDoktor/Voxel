@@ -7,7 +7,12 @@ namespace Voxel
 	public class TestWorldBuilder : IWorldBuilder 
 	{
         byte m_SolidBlock = (byte)BlockType.Solid;
-		public void BuildWorldChunk(WorldData world, Chunk chunk)
+
+        public void Init(WorldData world)
+        {
+        }
+
+        public void BuildWorldChunk(WorldData world, Chunk chunk)
 		{
 			IntVec3 size = world.ChunkSizeBlocks;
 

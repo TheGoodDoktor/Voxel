@@ -240,6 +240,7 @@ public static class PerlinSimplexNoise
         } 
 
         // 2D simplex noise 
+        // return values in 0-1 range
         public static float noise(float xin, float yin) 
         { 
             float n0, n1, n2; // Noise contributions from the three corners 

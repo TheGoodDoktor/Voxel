@@ -6,6 +6,7 @@ namespace Voxel
 {
     public interface IWorldBuilder
     {
+        void Init(WorldData world);
         void BuildWorldChunk(WorldData world, Chunk chunk);
     }
 }

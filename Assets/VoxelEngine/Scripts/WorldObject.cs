@@ -62,11 +62,13 @@ namespace Voxel
             m_ChunkRoot = new GameObject("ChunkRoot");
             m_ChunkRoot.transform.parent = transform;
 
-            //m_WorldBuilder = new SimpleWorldBuilder();
-            m_WorldBuilder = new TestWorldBuilder();
-            
+            // Setup & run world builder
+            m_WorldBuilder = new SimpleWorldBuilder();
+            //m_WorldBuilder = new TestWorldBuilder();
+
+            m_WorldBuilder.Init(m_WorldData);
             // build all chunks
-            for(int chunkX =0;chunkX<m_WorldSizeChunks.x ;chunkX++)
+            for (int chunkX =0;chunkX<m_WorldSizeChunks.x ;chunkX++)
             {
                 for(int chunkY =0;chunkY<m_WorldSizeChunks.y ;chunkY++)
                 {
@@ -107,12 +109,16 @@ namespace Voxel
         {
             // TODO: Check world data for dirty chunks & rebuild them
             var dirtyChunks = m_WorldData.DirtyChunks;
-            foreach(var chunk in dirtyChunks)
+            int chunkCount = 0;
+
+            while(dirtyChunks.Count > 0 && chunkCount < 4)
             {
+                Chunk chunk = dirtyChunks[0];
                 m_MeshBuilder.BuildMeshFromChunk(chunk);
                 chunk.GameObject.CreateMeshFromChunk(chunk);
+                dirtyChunks.RemoveAt(0);
+                chunkCount++;
             }
-            dirtyChunks.Clear();
         }
 
         // functions to get & set voxels at world positions
