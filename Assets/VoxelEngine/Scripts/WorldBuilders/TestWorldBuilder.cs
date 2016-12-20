@@ -6,9 +6,9 @@ namespace Voxel
 {
 	public class TestWorldBuilder : IWorldBuilder 
 	{
-		public void BuildWorld(WorldData world)
+		public void BuildWorldChunk(WorldData world, Chunk chunk)
 		{
-			IntVec3 size = world.WorldSizeBlocks;
+			IntVec3 size = world.ChunkSizeBlocks;
 
 			for(int x=0;x<size.x;x++)
 			{
@@ -16,7 +16,13 @@ namespace Voxel
 				{
 					int height = Random.Range(1,10);
 					for(int y=0;y<height;y++)
-						world.SetBlock(new IntVec3(x,y,z),BlockType.Solid);
+					{
+						world.SetBlock(new IntVec3(
+							x + chunk.WorldPos.x,
+							y + chunk.WorldPos.y,
+							z + chunk.WorldPos.z),
+							BlockType.Solid);
+					}
 					
 				}
 			}

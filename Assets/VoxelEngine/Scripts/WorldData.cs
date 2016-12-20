@@ -88,6 +88,21 @@ namespace Voxel
 			    return chunk.Blocks[blockX, blockY, blockZ];
         }
 
+        // create a chunk at a given chunk coordinate
+        public Chunk CreateChunk(int chunkX,int chunkY,int chunkZ)
+        {
+            if(m_Chunks[chunkX, chunkY, chunkZ]  != null)   // if one already there return it
+                return m_Chunks[chunkX, chunkY, chunkZ];
+
+            Chunk chunk = new Chunk(this,new IntVec3(chunkX * m_ChunkSizeBlocks.x,chunkY * m_ChunkSizeBlocks.y,chunkZ * m_ChunkSizeBlocks.z));
+            chunk.ChunkPos = new IntVec3(chunkX, chunkY, chunkZ);
+            chunk.InitBlocks(m_ChunkSizeBlocks);
+            OnNewChunk(chunk);  // call event
+
+            m_Chunks[chunkX, chunkY, chunkZ] = chunk;
+            return chunk;
+        }
+
         public void SetBlock(IntVec3 pos, BlockType blockType, bool bMarkDirty = true)
         {
 		    if(PosOutsideWorld(pos))
@@ -112,12 +127,7 @@ namespace Voxel
 		    // (we could check against setting air as block type and early out ?)
 		    if(chunk == null)	
 		    {
-			    chunk = new Chunk(this,new IntVec3(chunkX * m_ChunkSizeBlocks.x,chunkY * m_ChunkSizeBlocks.y,chunkZ * m_ChunkSizeBlocks.z));
-                chunk.ChunkPos = new IntVec3(chunkX, chunkY, chunkZ);
-			    chunk.InitBlocks(m_ChunkSizeBlocks);
-                OnNewChunk(chunk);  // call event
-
-                m_Chunks[chunkX, chunkY, chunkZ] = chunk;
+			    chunk = CreateChunk(chunkX, chunkY, chunkZ);
 		    }
 		
 		    chunk.Blocks[blockX, blockY, blockZ].m_Type = blockType;

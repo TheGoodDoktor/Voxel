@@ -61,8 +61,20 @@ namespace Voxel
             m_ChunkRoot = new GameObject("ChunkRoot");
             m_ChunkRoot.transform.parent = transform;
 
-            m_WorldBuilder = new TestWorldBuilder();
-            m_WorldBuilder.BuildWorld(m_WorldData);
+            m_WorldBuilder = new SimpleWorldBuilder();
+            
+            // build all chunks
+            for(int chunkX =0;chunkX<m_WorldSizeChunks.x ;chunkX++)
+            {
+                for(int chunkY =0;chunkY<m_WorldSizeChunks.y ;chunkY++)
+                {
+                    for(int chunkZ =0;chunkZ<m_WorldSizeChunks.z ;chunkZ++)
+                    {
+                        Chunk chunk = m_WorldData.CreateChunk(chunkX,chunkY,chunkZ);
+                        m_WorldBuilder.BuildWorldChunk(m_WorldData,chunk);
+                    }
+                }
+            }
 
             //TestFillVoxels();
         }
