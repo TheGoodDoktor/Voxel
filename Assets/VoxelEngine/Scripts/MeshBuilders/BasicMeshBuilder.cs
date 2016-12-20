@@ -14,13 +14,20 @@ namespace Voxel
     public class BasicMeshBuilder : IMeshBuilder
     {
 	    private WorldData 	m_WorldData;	// voxel world data - needed because we need to look outside current chunk
-        private float       m_BlockSize;    // Size of block unit         
+        private float       m_BlockSize;    // Size of block unit   
+        private Vector3[]   m_FaceNormals = new Vector3[(int)BlockFace.Count];      
 	
 	    public BasicMeshBuilder(WorldData worldData, float blockSize)
 	    {
 		    m_WorldData = worldData;
             m_BlockSize = blockSize;
 
+            m_FaceNormals[(int)BlockFace.Top]       = new Vector3(0, 1, 0);
+            m_FaceNormals[(int)BlockFace.Bottom]    = new Vector3(0, -1, 0);
+            m_FaceNormals[(int)BlockFace.North]     = new Vector3(0, 0, 1);
+            m_FaceNormals[(int)BlockFace.South]     = new Vector3(0, 0, -1);
+            m_FaceNormals[(int)BlockFace.East]      = new Vector3(1, 0, 0);
+            m_FaceNormals[(int)BlockFace.West]      = new Vector3(-1, 0, 0);
         }
 	
 	    // Build mesh for supplied chunk & store in internal chunk mesh data
@@ -28,6 +35,7 @@ namespace Voxel
 	    {
             int index = 0;
             chunk.Vertices = new List<Vector3>();
+            chunk.Normals = new List<Vector3>();
             chunk.Indices = new List<int>();
             chunk.UVs = new List<Vector2>();
             chunk.Colours = new List<Color>();
@@ -64,17 +72,16 @@ namespace Voxel
 
             byte lightAmount = 255;//currentBlock.LightAmount;
 
-            // Below
+            // Check surround blocks, if they aren't transparent then they have an outside face
+
+            // Bottom
             Block block = m_WorldData.GetBlock(new IntVec3(blockX, blockY - 1, blockZ));
 
             if (block.IsTransparent() == false)
             {
-                // The block is solid. Just add its info to the mesh,
-                // using our current air block's light amount for its lighting.
-
                 AddBlockFace(   new IntVec3(x + 1, y, z), new IntVec3(x + 1, y, z + 1),
                                 new IntVec3(x, y, z + 1), new IntVec3(x, y, z), 
-                                0.5f, chunk, index, block.m_Type, BlockFace.Side, lightAmount);
+                                0.5f, chunk, index, block.m_Type, BlockFace.Bottom, lightAmount);
                 index += 4;
             }
 
@@ -86,11 +93,11 @@ namespace Voxel
                                 new IntVec3(x, y, z + 1),
                                 new IntVec3(x, y + 1, z + 1),
                                 new IntVec3(x, y + 1, z), 
-                                0.8f, chunk, index, block.m_Type, BlockFace.Side, lightAmount);
+                                0.8f, chunk, index, block.m_Type, BlockFace.West, lightAmount);
                 index += 4;
             }
 
-            // Above
+            // Top
             block = m_WorldData.GetBlock(new IntVec3(blockX, blockY + 1, blockZ));
             if (block.IsTransparent() == false)
             {
@@ -98,7 +105,7 @@ namespace Voxel
                                 new IntVec3(x, y + 1, z + 1),
                                 new IntVec3(x + 1, y + 1, z + 1),
                                 new IntVec3(x + 1, y + 1, z),
-                                0.9f, chunk, index, block.m_Type, BlockFace.Side, lightAmount);
+                                0.9f, chunk, index, block.m_Type, BlockFace.Top, lightAmount);
 
                 index += 4;
             }
@@ -111,7 +118,7 @@ namespace Voxel
                             new IntVec3(x + 1, y + 1,z + 1),  
                             new IntVec3(x + 1, y,z + 1), 
                             new IntVec3(x + 1, y, z), 
-                            0.7f, chunk, index, block.m_Type, BlockFace.Side, lightAmount);
+                            0.7f, chunk, index, block.m_Type, BlockFace.East, lightAmount);
 
                 index += 4;
             }
@@ -124,7 +131,7 @@ namespace Voxel
                             new IntVec3(x + 1, y + 1,z + 1), 
                             new IntVec3(x, y + 1,z + 1), 
                             new IntVec3(x, y, z + 1), 
-                            0.4f, chunk, index, block.m_Type, BlockFace.Bottom, lightAmount);
+                            0.4f, chunk, index, block.m_Type, BlockFace.North, lightAmount);
 
                 index += 4;
             }
@@ -137,7 +144,7 @@ namespace Voxel
                             new IntVec3(x, y + 1,z),
                             new IntVec3(x + 1, y + 1,z),
                             new IntVec3(x + 1, y, z),
-                                1.0f, chunk, index, block.m_Type, BlockFace.Top, lightAmount);
+                                1.0f, chunk, index, block.m_Type, BlockFace.South, lightAmount);
 
                 index += 4;
             }
@@ -145,25 +152,44 @@ namespace Voxel
             return index;
         }
 
+        // Get the texture crop form the atlas for a given texture type
+        Rect GetTextureCropForBlockFace(byte blockType, BlockFace blockFace)
+        {
+            // TODO: Get from lookup, we might want a different side texture which is why the face is passed in
+            Rect worldTextureAtlasUv = new Rect(0, 0, 1, 1);
+
+            return worldTextureAtlasUv;
+        }
+
 	    // Add a face to the chunk
 	    // This function could be in a base class if we need it for more mesh generators
-	    private void AddBlockFace(IntVec3 va, IntVec3 vb, IntVec3 vc, IntVec3 vd, float colour, Chunk chunk, int index, BlockType blockType,
+	    private void AddBlockFace(IntVec3 va, IntVec3 vb, IntVec3 vc, IntVec3 vd, float colour, Chunk chunk, int index, byte blockType,
                                   BlockFace blockFace,
                                   byte blockLight)
         {
             float actualColour = (colour * blockLight) / 255;
             const float epsilon = 0.001f;
+
+            // Vertices
             chunk.Vertices.Add( va.ToVector3() * m_BlockSize);
             chunk.Vertices.Add( vb.ToVector3() * m_BlockSize);
             chunk.Vertices.Add( vc.ToVector3() * m_BlockSize);
             chunk.Vertices.Add( vd.ToVector3() * m_BlockSize);
 
+            // Normals
+            chunk.Normals.Add(m_FaceNormals[(int)blockFace]);
+            chunk.Normals.Add(m_FaceNormals[(int)blockFace]);
+            chunk.Normals.Add(m_FaceNormals[(int)blockFace]);
+            chunk.Normals.Add(m_FaceNormals[(int)blockFace]);
+
+            // Colours
             var item = new Color(actualColour, actualColour, actualColour, 1.0f);
             chunk.Colours.Add(item);
             chunk.Colours.Add(item);
             chunk.Colours.Add(item);
             chunk.Colours.Add(item);
 
+            // Index quad of 2 tris
             chunk.Indices.Add(index + 2);
             chunk.Indices.Add(index + 1);
             chunk.Indices.Add(index + 0);
@@ -172,11 +198,8 @@ namespace Voxel
             chunk.Indices.Add(index + 3);
             chunk.Indices.Add(index + 2);
 
-		    // TODO: Sort out UV generation
-		    // we might want to use texture arrays but will probably start off with atlases
-		
-            Rect worldTextureAtlasUv = new Rect(0,0,1,1);   // TODO: get from atlas
-                //m_WorldData.BlockUVCoordinates[(int) blockType].BlockFaceUvCoordinates[(int) blockFace];
+            // Texture coords
+            Rect worldTextureAtlasUv = GetTextureCropForBlockFace(blockType,blockFace);
 
             chunk.UVs.Add(new Vector2(worldTextureAtlasUv.x + epsilon, worldTextureAtlasUv.y + epsilon));
             chunk.UVs.Add(new Vector2(worldTextureAtlasUv.x + epsilon,

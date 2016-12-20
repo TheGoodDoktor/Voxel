@@ -5,21 +5,28 @@ namespace Voxel
 public enum BlockType : byte
 {
     Air = 0,
-	Solid = 1,
+	Solid,
+
+    Count
 }
 
 public enum BlockFace : byte
 {
     Top = 0,
-    Side = 1,
-    Bottom = 2
+    Bottom,
+    North,
+    South,
+    East,
+    West,
+
+    Count
 }
 
 public struct Block
 {
-	public BlockType m_Type;
+	public byte m_Type;
 
-    public bool IsTransparent() {return m_Type == BlockType.Air;}
+    public bool IsTransparent() {return m_Type == (int)BlockType.Air;}
 }
 
 }

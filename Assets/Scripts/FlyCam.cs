@@ -11,16 +11,29 @@ public class FlyCam : MonoBehaviour {
 	private float m_RotationY = 0;
 	private Camera m_Camera;
 
-	// Use this for initialization
-	void Start () 
+    private byte m_BlockTypeAdd = (byte)Voxel.BlockType.Solid;
+    private byte m_BlockTypeRemove = (byte)Voxel.BlockType.Air;
+
+    // Use this for initialization
+    void Start () 
 	{
 		m_Camera = GetComponent<Camera>();
 		Cursor.lockState = CursorLockMode.Locked;
 	}
-	
-	// Update is called once per frame
-	void Update () 
-	{	
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (Cursor.lockState == CursorLockMode.Locked)
+            UpdateMovementControls();
+
+        // toggle lock/free cursor
+        if (Input.GetKeyDown(KeyCode.L))
+            Cursor.lockState = (Cursor.lockState == CursorLockMode.Locked) ? CursorLockMode.None : CursorLockMode.Locked;
+    }
+
+    void UpdateMovementControls()
+    { 
 		// Handle Rotation
 		m_RotationX += Input.GetAxis("Mouse X") * m_Sensitivity * Time.deltaTime;
 		m_RotationY += Input.GetAxis("Mouse Y") * m_Sensitivity * Time.deltaTime;
@@ -34,18 +47,23 @@ public class FlyCam : MonoBehaviour {
 		float moveForward = Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime;
 		float moveRight = Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime;
 
-		transform.position += transform.forward * moveForward;
-		transform.position += transform.right * moveRight;
+        Vector3 velocity = transform.forward * moveForward;
+        velocity += transform.right * moveRight;
 
-		if (Input.GetKey (KeyCode.Q)) 
-			transform.position += transform.up * moveSpeed * Time.deltaTime;
+       if (Input.GetKey (KeyCode.Q))
+            velocity += transform.up * moveSpeed * Time.deltaTime;
 		if (Input.GetKey (KeyCode.E))
-			transform.position -= transform.up * moveSpeed * Time.deltaTime;
- 
-		// toggle lock/free cursor
-		if (Input.GetKeyDown (KeyCode.L))
-			Cursor.lockState = (Cursor.lockState == CursorLockMode.Locked) ? CursorLockMode.None : CursorLockMode.Locked;
+            velocity -= transform.up * moveSpeed * Time.deltaTime;
 
+        // Simple raytrace movement check
+        Ray collisionRay = new Ray(transform.position, velocity);
+        if (Physics.Raycast(transform.position, velocity, velocity.magnitude))
+        {
+            velocity = Vector3.zero;
+        }
+
+        transform.position += velocity;
+ 
 		// screen trace
 		Ray ray = m_Camera.ViewportPointToRay(new Vector3(0.5F, 0.5F, 0));
         RaycastHit hit;
@@ -54,12 +72,12 @@ public class FlyCam : MonoBehaviour {
 			// add/remove blocks on mouse click
 			if (Input.GetMouseButtonDown(0))
 			{
-				Voxel.WorldObject.Instance.SetBlockInFrontOfRayHit(hit,Voxel.BlockType.Solid);
+				Voxel.WorldObject.Instance.SetBlockInFrontOfRayHit(hit,m_BlockTypeAdd);
 			}
 
 			if (Input.GetMouseButtonDown(1))
 			{
-				Voxel.WorldObject.Instance.SetBlockBehindRayHit(hit,Voxel.BlockType.Air);
+				Voxel.WorldObject.Instance.SetBlockBehindRayHit(hit, m_BlockTypeRemove);
 			}
 			
 		}

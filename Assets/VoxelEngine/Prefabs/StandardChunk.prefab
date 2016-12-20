@@ -51,5 +51,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49730fa2d599840d0bd9fdb93ad0d2bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Shader: {fileID: 10505, guid: 0000000000000000f000000000000000, type: 0}
+  Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
   Texture: {fileID: 10305, guid: 0000000000000000f000000000000000, type: 0}
+  TextureArray: {fileID: 0}

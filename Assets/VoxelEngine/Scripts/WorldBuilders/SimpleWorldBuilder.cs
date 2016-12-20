@@ -44,7 +44,7 @@ namespace Voxel
                     blockType = BlockType.Solid;
                 }
                 
-                chunk.Blocks[blockXInChunk, y, blockZInChunk].m_Type = blockType;
+				chunk.Blocks[blockXInChunk, y, blockZInChunk].m_Type = (byte)blockType;
             }
         }
 	}

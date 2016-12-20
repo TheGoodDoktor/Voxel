@@ -30,7 +30,7 @@ namespace Voxel
         
         public WorldData()
 	    {
-		    m_OutsideBlock.m_Type = BlockType.Air;	// block used to return invalid types etc.
+		    m_OutsideBlock.m_Type = (byte)BlockType.Air;	// block used to return invalid types etc.
 	    }
 
         // this must be called before init chunks
@@ -103,7 +103,7 @@ namespace Voxel
             return chunk;
         }
 
-        public void SetBlock(IntVec3 pos, BlockType blockType, bool bMarkDirty = true)
+        public void SetBlock(IntVec3 pos, byte blockType, bool bMarkDirty = true)
         {
 		    if(PosOutsideWorld(pos))
             {
