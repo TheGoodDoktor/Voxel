@@ -55,7 +55,7 @@ namespace Voxel
             Block currentBlock = chunk.Blocks[x, y, z];
             Vector3[] points = new Vector3[8];
             Vector3[] vertlist = new Vector3[12];
-            float isoLevel = 0.6f;  // TODO: proper value
+            float isoLevel = 0.8f;  // TODO: proper value
 
             // Fill in vertex density values
             float[] density = CalculateDensitiesForBlock(blockX, blockY, blockZ);
@@ -133,9 +133,9 @@ namespace Voxel
                 chunk.Normals.Add(normal);
                 chunk.Normals.Add(normal);
                 chunk.Normals.Add(normal);
-                //chunk.Colours.Add(Color.red);
-                //chunk.Colours.Add(Color.red);
-                //chunk.Colours.Add(Color.red);
+                chunk.Colours.Add(Color.red);
+                chunk.Colours.Add(Color.red);
+                chunk.Colours.Add(Color.red);
                 chunk.Indices.Add(index++);
                 chunk.Indices.Add(index++);
                 chunk.Indices.Add(index++);
@@ -159,9 +159,13 @@ namespace Voxel
             if (Mathf.Abs(valp1-valp2) < 0.00001)
                 return(p1);
             mu = (isolevel - valp1) / (valp2 - valp1);
-            p.x = p1.x + mu* (p2.x - p1.x);
-            p.y = p1.y + mu* (p2.y - p1.y);
-            p.z = p1.z + mu* (p2.z - p1.z);
+
+            if (mu > 1.0f)
+                Debug.Log("mu value is: " + mu.ToString());
+           
+            p.x = p1.x + (mu* (p2.x - p1.x));
+            p.y = p1.y + (mu* (p2.y - p1.y));
+            p.z = p1.z + (mu* (p2.z - p1.z));
 
             return(p);
         }
@@ -170,14 +174,14 @@ namespace Voxel
         {
             float[] density = { 0, 0, 0, 0, 0, 0, 0, 0 };
             
-            density[0] = m_WorldData.GetBlock(new IntVec3(blockX, blockY, blockZ+1)).IsTransparent() ? 0 : 1;
-            density[1] = m_WorldData.GetBlock(new IntVec3(blockX+1, blockY, blockZ+1)).IsTransparent() ? 0 : 1;
-            density[2] = m_WorldData.GetBlock(new IntVec3(blockX+1, blockY, blockZ)).IsTransparent() ? 0 : 1;
-            density[3] = m_WorldData.GetBlock(new IntVec3(blockX, blockY, blockZ)).IsTransparent() ? 0 : 1;
-            density[4] = m_WorldData.GetBlock(new IntVec3(blockX, blockY+1, blockZ+1)).IsTransparent() ? 0 : 1;
-            density[5] = m_WorldData.GetBlock(new IntVec3(blockX+1, blockY+1, blockZ+1)).IsTransparent() ? 0 : 1;
-            density[6] = m_WorldData.GetBlock(new IntVec3(blockX+1, blockY+1, blockZ)).IsTransparent() ? 0 : 1;
-            density[7] = m_WorldData.GetBlock(new IntVec3(blockX, blockY+1, blockZ)).IsTransparent() ? 0 : 1;
+            density[0] = m_WorldData.GetBlock(new IntVec3(blockX, blockY, blockZ+1)).m_Density;
+            density[1] = m_WorldData.GetBlock(new IntVec3(blockX+1, blockY, blockZ+1)).m_Density;
+            density[2] = m_WorldData.GetBlock(new IntVec3(blockX+1, blockY, blockZ)).m_Density;
+            density[3] = m_WorldData.GetBlock(new IntVec3(blockX, blockY, blockZ)).m_Density;
+            density[4] = m_WorldData.GetBlock(new IntVec3(blockX, blockY+1, blockZ+1)).m_Density;
+            density[5] = m_WorldData.GetBlock(new IntVec3(blockX+1, blockY+1, blockZ+1)).m_Density;
+            density[6] = m_WorldData.GetBlock(new IntVec3(blockX+1, blockY+1, blockZ)).m_Density;
+            density[7] = m_WorldData.GetBlock(new IntVec3(blockX, blockY+1, blockZ)).m_Density;
 
             return density;
         }

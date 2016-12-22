@@ -59,7 +59,7 @@ namespace Voxel
 
 		private void GenerateTerrain(Chunk chunk, int blockXInChunk, int blockZInChunk, int blockX, int blockZ, int worldHeightInBlocks)
         {
-            int groundHeightInChunk = (int)m_HeightField[blockX,blockZ] - chunk.WorldPos.y;
+            int groundHeightInChunk = Mathf.FloorToInt(m_HeightField[blockX,blockZ]) - chunk.WorldPos.y;
 
             for (int y = 0; y < chunk.World.ChunkSizeBlocks.y; y++)
             {
@@ -80,15 +80,21 @@ namespace Voxel
                         if (initialNoise > 0.2f)
                         {
                             blockType = m_AirBlock; // cave
+                            density = 0;
                         }
-
-                        // TODO: work out cave density
+                        else
+                        {
+                            // TODO: work out cave density
+                            density = 1.0f - initialNoise;
+                        }
                     }
 
                 }
                 else
                 {
                     // TODO: work out above ground density
+                    if(y == groundHeightInChunk)
+                        density = m_HeightField[blockX, blockZ] - Mathf.Floor(m_HeightField[blockX, blockZ]);
                 }
                 
                 chunk.Blocks[blockXInChunk, y, blockZInChunk].m_Type = blockType;
