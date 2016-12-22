@@ -6,14 +6,15 @@ namespace Voxel
 {
 	public class SimpleWorldBuilder : IWorldBuilder 
 	{
-        private int[,]  m_HeightField;
+        private float[,]  m_HeightField;
         private byte m_AirBlock = (byte)BlockType.Air;
         private byte m_SolidBlock = (byte)BlockType.Solid;
+        private bool m_bBuildCaves = true;
 
         // Initialise the worldbuilder by creating a heightfield
         public void Init(WorldData world)
         {
-            m_HeightField = new int[world.WorldSizeBlocks.x, world.WorldSizeBlocks.z];
+            m_HeightField = new float[world.WorldSizeBlocks.x, world.WorldSizeBlocks.z];
             int worldHeightInBlocks = world.WorldSizeBlocks.y;
             int minimumGroundheight = worldHeightInBlocks / 4;
             int groundheightRange = (int)(worldHeightInBlocks * 0.75f);
@@ -29,7 +30,7 @@ namespace Voxel
                     float octave5 = PerlinSimplexNoise.noise(blockX * 0.03f, blockZ * 0.03f) * octave4;
                     float lowerGroundHeight = octave1 + octave2 + octave3 + octave4 + octave5;
                     lowerGroundHeight = (lowerGroundHeight * groundheightRange) + minimumGroundheight;
-                    m_HeightField[blockX, blockZ] = (int)lowerGroundHeight;
+                    m_HeightField[blockX, blockZ] = lowerGroundHeight;
                 }
             }
         }
@@ -58,28 +59,40 @@ namespace Voxel
 
 		private void GenerateTerrain(Chunk chunk, int blockXInChunk, int blockZInChunk, int blockX, int blockZ, int worldHeightInBlocks)
         {
-            int groundHeightInChunk = m_HeightField[blockX,blockZ] - chunk.WorldPos.y;
+            int groundHeightInChunk = (int)m_HeightField[blockX,blockZ] - chunk.WorldPos.y;
 
             for (int y = 0; y < chunk.World.ChunkSizeBlocks.y; y++)
             {
                 bool bUnderground = y < groundHeightInChunk;
+                float density = bUnderground ? 1.0f : 0.0f;
                 byte blockType = bUnderground ? m_SolidBlock : m_AirBlock;
 
                 if(bUnderground)    // are we underground - check for caves
                 {
-                    int worldY = y + chunk.WorldPos.y;
-                    float octave1 = PerlinSimplexNoise.noise(blockX * 0.009f, blockZ * 0.009f, worldY * 0.009f) * 0.25f;
-
-                    float initialNoise = octave1 + PerlinSimplexNoise.noise(blockX * 0.04f, blockZ * 0.04f, worldY * 0.04f) * 0.15f;
-                    initialNoise += PerlinSimplexNoise.noise(blockX * 0.08f, blockZ * 0.08f, worldY * 0.08f) * 0.05f;
-
-                    if (initialNoise > 0.2f)
+                    if (m_bBuildCaves)
                     {
-                        blockType = m_AirBlock; // cave
+                        int worldY = y + chunk.WorldPos.y;
+                        float octave1 = PerlinSimplexNoise.noise(blockX * 0.009f, blockZ * 0.009f, worldY * 0.009f) * 0.25f;
+
+                        float initialNoise = octave1 + PerlinSimplexNoise.noise(blockX * 0.04f, blockZ * 0.04f, worldY * 0.04f) * 0.15f;
+                        initialNoise += PerlinSimplexNoise.noise(blockX * 0.08f, blockZ * 0.08f, worldY * 0.08f) * 0.05f;
+
+                        if (initialNoise > 0.2f)
+                        {
+                            blockType = m_AirBlock; // cave
+                        }
+
+                        // TODO: work out cave density
                     }
+
+                }
+                else
+                {
+                    // TODO: work out above ground density
                 }
                 
                 chunk.Blocks[blockXInChunk, y, blockZInChunk].m_Type = blockType;
+                chunk.Blocks[blockXInChunk, y, blockZInChunk].m_Density = density;
             }
         }
 	}

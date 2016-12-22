@@ -50,6 +50,15 @@ namespace Voxel
 		    m_WorldSize = new IntVec3(m_WorldSizeChunks.x * m_ChunkSizeBlocks.x,m_WorldSizeChunks.y * m_ChunkSizeBlocks.y,m_WorldSizeChunks.z * m_ChunkSizeBlocks.z);
         }
 
+        public void MarkAllChunksDirty()
+        {
+            foreach (Chunk chunk in m_Chunks)
+            {
+                if (chunk.MarkDirty())
+                    AddDirtyChunk(chunk);
+            }
+        }
+
         public void AddDirtyChunk(Chunk chunk)
         {
             m_DirtyChunks.Add(chunk);

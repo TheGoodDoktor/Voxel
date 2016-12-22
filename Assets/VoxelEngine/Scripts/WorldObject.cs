@@ -11,8 +11,12 @@ namespace Voxel
         public IntVec3 m_ChunkSizeBlocks = new IntVec3(32, 32, 32);
         public GameObject m_ChunkPrefab;
         public BlockInfoList m_BlockInfoList;
+        public bool m_TestMeshBuilder = false;
 
         private WorldData m_WorldData = new WorldData();
+
+        private BasicMeshBuilder m_BasicMeshBuilder;
+        private MarchingCubesMeshBuilder m_MarchingCubesMeshBuilder;
         private IMeshBuilder m_MeshBuilder;
         private IWorldBuilder m_WorldBuilder;
 
@@ -56,9 +60,9 @@ namespace Voxel
 
             // Create a basic mesh builder
             // TODO: use a specified mesh builder?
-            //m_MeshBuilder = new BasicMeshBuilder(m_WorldData, m_BlockSize);
-            m_MeshBuilder = new MarchingCubesMeshBuilder(m_WorldData, m_BlockSize);
-            
+            m_BasicMeshBuilder = new BasicMeshBuilder(m_WorldData, m_BlockSize);
+            m_MarchingCubesMeshBuilder = new MarchingCubesMeshBuilder(m_WorldData, m_BlockSize);
+            m_MeshBuilder = m_BasicMeshBuilder;
 
             // Hierachy
             m_ChunkRoot = new GameObject("ChunkRoot");
@@ -106,9 +110,21 @@ namespace Voxel
             chunk.GameObject = newChunkGameObj.GetComponent<ChunkObject>();
         }
 
-	    // Update is called once per frame
-	    void Update ()
+        // Update is called once per frame
+        void Update ()
         {
+            IMeshBuilder newMeshBuilder = null;
+            if (m_TestMeshBuilder)
+                newMeshBuilder = m_MarchingCubesMeshBuilder;
+            else
+                newMeshBuilder = m_BasicMeshBuilder;
+
+            if(newMeshBuilder != m_MeshBuilder)
+            {
+                m_MeshBuilder = newMeshBuilder;
+                m_WorldData.MarkAllChunksDirty();
+            }
+
             // TODO: Check world data for dirty chunks & rebuild them
             var dirtyChunks = m_WorldData.DirtyChunks;
             int chunkCount = 0;

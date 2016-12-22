@@ -25,6 +25,7 @@ public enum BlockFace : byte
 public struct Block
 {
 	public byte m_Type;
+    public float m_Density;
 
     public bool IsTransparent() {return m_Type == (int)BlockType.Air;}
 }

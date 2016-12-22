@@ -42,7 +42,7 @@ public class ChunkObject : MonoBehaviour
         m_MeshFilter.mesh.vertices = chunk.Vertices.ToArray();
         m_MeshFilter.mesh.normals = chunk.Normals.ToArray();
         m_MeshFilter.mesh.uv = chunk.UVs.ToArray();
-        //m_MeshFilter.mesh.colors = chunk.Colours.ToArray();
+        m_MeshFilter.mesh.colors = chunk.Colours.ToArray();
         m_MeshFilter.mesh.triangles = chunk.Indices.ToArray();
         m_MeshCollider.sharedMesh = null;
         m_MeshCollider.sharedMesh = m_MeshFilter.mesh;

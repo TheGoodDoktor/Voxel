@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// This mesh build uses the marching cubes algorithm documented here:
+// This mesh builder uses the marching cubes algorithm documented here:
 // http://paulbourke.net/geometry/polygonise/
+// It uses the algorithm, table data and the c# code here is a conversion of the c code on the page
 
 namespace Voxel
 {
@@ -60,14 +61,16 @@ namespace Voxel
             float[] density = CalculateDensitiesForBlock(blockX, blockY, blockZ);
 
             // Fill in block points
-            points[0] = new Vector3(x+0,y+0,z+1) * m_BlockSize;
-            points[1] = new Vector3(x+1,y+0,z+1) * m_BlockSize;
-            points[2] = new Vector3(x+1,y+0,z+1) * m_BlockSize;
-            points[3] = new Vector3(x+0,y+0,z+0) * m_BlockSize;
-            points[4] = new Vector3(x+0,y+1,z+1) * m_BlockSize;
-            points[5] = new Vector3(x+1,y+1,z+1) * m_BlockSize;
-            points[6] = new Vector3(x+1,y+1,z+0) * m_BlockSize;
-            points[7] = new Vector3(x+0,y+1,z+0) * m_BlockSize;
+            Vector3 offset = new Vector3(0.5f, 0.5f, 0.5f);
+            points[0] = (new Vector3(x+0,y+0,z+1) + offset) * m_BlockSize;
+            points[1] = (new Vector3(x+1,y+0,z+1) + offset) * m_BlockSize;
+            points[2] = (new Vector3(x+1,y+0,z+0) + offset) * m_BlockSize;
+            points[3] = (new Vector3(x+0,y+0,z+0) + offset) * m_BlockSize;
+
+            points[4] = (new Vector3(x+0,y+1,z+1) + offset) * m_BlockSize;
+            points[5] = (new Vector3(x+1,y+1,z+1) + offset) * m_BlockSize;
+            points[6] = (new Vector3(x+1,y+1,z+0) + offset) * m_BlockSize;
+            points[7] = (new Vector3(x+0,y+1,z+0) + offset) * m_BlockSize;
 
             int cubeindex = 0;
             if (density[0] < isoLevel) cubeindex |= 1;
@@ -81,7 +84,7 @@ namespace Voxel
 
             // Cube is entirely in/out of the surface 
             if (m_EdgeTable[cubeindex] == 0)
-                return (0);
+                return index;
 
             // Find the vertices where the surface intersects the cube 
             if ((m_EdgeTable[cubeindex] & 1) != 0)
@@ -113,14 +116,33 @@ namespace Voxel
             int ntriang = 0;
             for (int i = 0; m_TriTable[cubeindex, i] != -1; i += 3)
             {
-                chunk.Vertices.Add(vertlist[m_TriTable[cubeindex,i + 0]]);
-                chunk.Vertices.Add(vertlist[m_TriTable[cubeindex,i + 1]]);
-                chunk.Vertices.Add(vertlist[m_TriTable[cubeindex,i + 2]]);
+                //Vector3 vertA = points[1];
+                //Vector3 vertB = points[2];
+                //Vector3 vertC = points[3]; 
+                Vector3 vertA = vertlist[m_TriTable[cubeindex, i + 0]];
+                Vector3 vertB = vertlist[m_TriTable[cubeindex, i + 1]];
+                Vector3 vertC = vertlist[m_TriTable[cubeindex, i + 2]];
+
+                Vector3 normal = Vector3.Cross(vertB - vertA, vertC - vertA).normalized;
+                //Debug.Log("vert A: " + vertA.ToString());
+                //Debug.Log("vert B: " + vertB.ToString());
+                //Debug.Log("vert C: " + vertC.ToString());
+                chunk.Vertices.Add(vertA);
+                chunk.Vertices.Add(vertB);
+                chunk.Vertices.Add(vertC);
+                chunk.Normals.Add(normal);
+                chunk.Normals.Add(normal);
+                chunk.Normals.Add(normal);
+                //chunk.Colours.Add(Color.red);
+                //chunk.Colours.Add(Color.red);
+                //chunk.Colours.Add(Color.red);
                 chunk.Indices.Add(index++);
                 chunk.Indices.Add(index++);
                 chunk.Indices.Add(index++);
                 ntriang++;
             }
+
+            //Debug.Log("Created " + ntriang.ToString() + " for block at " + new IntVec3(x, y, z).ToString());
 
             return index;
         }
@@ -147,68 +169,15 @@ namespace Voxel
         float[] CalculateDensitiesForBlock(int blockX, int blockY, int blockZ)
         {
             float[] density = { 0, 0, 0, 0, 0, 0, 0, 0 };
-            float faceAmount = 1.0f/3.0f;   // max 3 faces affecting point
-
-            // Bottom
-            Block block = m_WorldData.GetBlock(new IntVec3(blockX, blockY - 1, blockZ));
-
-            if (block.IsTransparent() == false)
-            {
-                density[0] = 1;//+= faceAmount;
-                density[1] = 1;// += faceAmount;
-                density[2] = 1;// += faceAmount;
-                density[3] = 1;// += faceAmount;
-            }
-
-            // West
-            block = m_WorldData.GetBlock(new IntVec3(blockX - 1, blockY, blockZ));
-            if (block.IsTransparent() == false)
-            {
-                density[0] = 1;// += faceAmount;
-                density[3] = 1;// += faceAmount;
-                density[4] = 1;// += faceAmount;
-                density[7] = 1;// += faceAmount;
-            }
-
-            // Top
-            block = m_WorldData.GetBlock(new IntVec3(blockX, blockY + 1, blockZ));
-            if (block.IsTransparent() == false)
-            {
-                density[4] = 1;// += faceAmount;
-                density[5] = 1;// += faceAmount;
-                density[6] = 1;// += faceAmount;
-                density[7] = 1;// += faceAmount;
-            }
-
-            // East 
-            block = m_WorldData.GetBlock(new IntVec3(blockX + 1, blockY, blockZ));
-            if (block.IsTransparent() == false)
-            {
-                density[1] = 1;// += faceAmount;
-                density[2] = 1;// += faceAmount;
-                density[5] = 1;// += faceAmount;
-                density[6] = 1;// += faceAmount;
-            }
-
-            // North
-            block = m_WorldData.GetBlock(new IntVec3(blockX, blockY, blockZ + 1));
-            if (block.IsTransparent() == false)
-            {
-                density[0] = 1;// += faceAmount;
-                density[1] = 1;// += faceAmount;
-                density[4] = 1;// += faceAmount;
-                density[5] = 1;// += faceAmount;
-            }
-
-            // South
-            block = m_WorldData.GetBlock(new IntVec3(blockX, blockY, blockZ - 1));
-            if (block.IsTransparent() == false)
-            {
-                density[2] = 1;// += faceAmount;
-                density[3] = 1;// += faceAmount;
-                density[6] = 1;// += faceAmount;
-                density[7] = 1;// += faceAmount;
-            }
+            
+            density[0] = m_WorldData.GetBlock(new IntVec3(blockX, blockY, blockZ+1)).IsTransparent() ? 0 : 1;
+            density[1] = m_WorldData.GetBlock(new IntVec3(blockX+1, blockY, blockZ+1)).IsTransparent() ? 0 : 1;
+            density[2] = m_WorldData.GetBlock(new IntVec3(blockX+1, blockY, blockZ)).IsTransparent() ? 0 : 1;
+            density[3] = m_WorldData.GetBlock(new IntVec3(blockX, blockY, blockZ)).IsTransparent() ? 0 : 1;
+            density[4] = m_WorldData.GetBlock(new IntVec3(blockX, blockY+1, blockZ+1)).IsTransparent() ? 0 : 1;
+            density[5] = m_WorldData.GetBlock(new IntVec3(blockX+1, blockY+1, blockZ+1)).IsTransparent() ? 0 : 1;
+            density[6] = m_WorldData.GetBlock(new IntVec3(blockX+1, blockY+1, blockZ)).IsTransparent() ? 0 : 1;
+            density[7] = m_WorldData.GetBlock(new IntVec3(blockX, blockY+1, blockZ)).IsTransparent() ? 0 : 1;
 
             return density;
         }
