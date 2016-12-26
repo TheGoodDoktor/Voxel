@@ -4,15 +4,16 @@ using UnityEngine;
 
 namespace Voxel
 {
-	public class TestWorldBuilder : IWorldBuilder 
+    [CreateAssetMenu(fileName = "TestWorldBuilder", menuName = "Voxel/World Builders/Test", order = 1)]
+	public class TestWorldBuilder : WorldBuilder 
 	{
         byte m_SolidBlock = (byte)BlockType.Solid;
 
-        public void Init(WorldData world)
+        public override void Init(WorldData world)
         {
         }
 
-        public void BuildWorldChunk(WorldData world, Chunk chunk)
+        public override void BuildWorldChunk(WorldData world, Chunk chunk)
 		{
 			IntVec3 size = world.ChunkSizeBlocks;
 
@@ -23,10 +24,10 @@ namespace Voxel
 					int height = Random.Range(1,10);
 					for(int y=0;y<height;y++)
 					{
-						world.SetBlock(new IntVec3(
+						world.SetBlock(
 							x + chunk.WorldPos.x,
 							y + chunk.WorldPos.y,
-							z + chunk.WorldPos.z),
+							z + chunk.WorldPos.z,
 							m_SolidBlock);
 					}					
 				}

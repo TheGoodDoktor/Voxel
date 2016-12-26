@@ -8,18 +8,21 @@ using UnityEngine;
 
 namespace Voxel
 {
-    public class MarchingCubesMeshBuilder : IMeshBuilder
+    [CreateAssetMenu(fileName = "MarchingCubesBuilder", menuName = "Voxel/Mesh Builders/MarchingCubes", order = 1)]
+    public class MarchingCubesMeshBuilder : MeshBuilder
     {
+        public bool m_bUseDensities = false;    // use block density values or pure voxel data
+
         private WorldData m_WorldData;  // voxel world data - needed because we need to look outside current chunk
         private float m_BlockSize = 1.0f;
-
+ 
         public MarchingCubesMeshBuilder(WorldData worldData, float blockSize)
         {
             m_WorldData = worldData;
             m_BlockSize = blockSize;
         }
 
-        public void BuildMeshFromChunk(Chunk chunk)
+        public override void BuildMeshFromChunk(Chunk chunk)
         {
             int index = 0;
             chunk.Vertices = new List<Vector3>();
@@ -52,7 +55,7 @@ namespace Voxel
         // Buid the mesh for a given block within a chunk
         private int BuildMeshForBlock(int blockX, int blockY, int blockZ, int x, int y, int z, Chunk chunk, int index)
         {
-            Block currentBlock = chunk.Blocks[x, y, z];
+            //Block currentBlock = chunk.Blocks[x, y, z];
             Vector3[] points = new Vector3[8];
             Vector3[] vertlist = new Vector3[12];
             float isoLevel = 0.8f;  // TODO: proper value
@@ -60,7 +63,8 @@ namespace Voxel
             // Fill in vertex density values
             float[] density = CalculateDensitiesForBlock(blockX, blockY, blockZ);
 
-            // Fill in block points
+            // Fill in block corner positions in object space
+            // we offset by 0.5 because the centre of the marching cube mesh is where 8 blocks intersect
             Vector3 offset = new Vector3(0.5f, 0.5f, 0.5f);
             points[0] = (new Vector3(x+0,y+0,z+1) + offset) * m_BlockSize;
             points[1] = (new Vector3(x+1,y+0,z+1) + offset) * m_BlockSize;
@@ -116,26 +120,22 @@ namespace Voxel
             int ntriang = 0;
             for (int i = 0; m_TriTable[cubeindex, i] != -1; i += 3)
             {
-                //Vector3 vertA = points[1];
-                //Vector3 vertB = points[2];
-                //Vector3 vertC = points[3]; 
                 Vector3 vertA = vertlist[m_TriTable[cubeindex, i + 0]];
                 Vector3 vertB = vertlist[m_TriTable[cubeindex, i + 1]];
                 Vector3 vertC = vertlist[m_TriTable[cubeindex, i + 2]];
 
+                // calculate the normal the old fashioned way
                 Vector3 normal = Vector3.Cross(vertB - vertA, vertC - vertA).normalized;
-                //Debug.Log("vert A: " + vertA.ToString());
-                //Debug.Log("vert B: " + vertB.ToString());
-                //Debug.Log("vert C: " + vertC.ToString());
+                
                 chunk.Vertices.Add(vertA);
                 chunk.Vertices.Add(vertB);
                 chunk.Vertices.Add(vertC);
                 chunk.Normals.Add(normal);
                 chunk.Normals.Add(normal);
                 chunk.Normals.Add(normal);
-                chunk.Colours.Add(Color.red);
-                chunk.Colours.Add(Color.red);
-                chunk.Colours.Add(Color.red);
+                //chunk.Colours.Add(Color.red);
+                //chunk.Colours.Add(Color.red);
+                //chunk.Colours.Add(Color.red);
                 chunk.Indices.Add(index++);
                 chunk.Indices.Add(index++);
                 chunk.Indices.Add(index++);
@@ -174,15 +174,29 @@ namespace Voxel
         {
             float[] density = { 0, 0, 0, 0, 0, 0, 0, 0 };
             
-            density[0] = m_WorldData.GetBlock(new IntVec3(blockX, blockY, blockZ+1)).m_Density;
-            density[1] = m_WorldData.GetBlock(new IntVec3(blockX+1, blockY, blockZ+1)).m_Density;
-            density[2] = m_WorldData.GetBlock(new IntVec3(blockX+1, blockY, blockZ)).m_Density;
-            density[3] = m_WorldData.GetBlock(new IntVec3(blockX, blockY, blockZ)).m_Density;
-            density[4] = m_WorldData.GetBlock(new IntVec3(blockX, blockY+1, blockZ+1)).m_Density;
-            density[5] = m_WorldData.GetBlock(new IntVec3(blockX+1, blockY+1, blockZ+1)).m_Density;
-            density[6] = m_WorldData.GetBlock(new IntVec3(blockX+1, blockY+1, blockZ)).m_Density;
-            density[7] = m_WorldData.GetBlock(new IntVec3(blockX, blockY+1, blockZ)).m_Density;
-
+            if(m_bUseDensities)
+            {
+                density[0] = m_WorldData.GetBlock(blockX, blockY, blockZ+1).m_Density;
+                density[1] = m_WorldData.GetBlock(blockX+1, blockY, blockZ+1).m_Density;
+                density[2] = m_WorldData.GetBlock(blockX+1, blockY, blockZ).m_Density;
+                density[3] = m_WorldData.GetBlock(blockX, blockY, blockZ).m_Density;
+                density[4] = m_WorldData.GetBlock(blockX, blockY+1, blockZ+1).m_Density;
+                density[5] = m_WorldData.GetBlock(blockX+1, blockY+1, blockZ+1).m_Density;
+                density[6] = m_WorldData.GetBlock(blockX+1, blockY+1, blockZ).m_Density;
+                density[7] = m_WorldData.GetBlock(blockX, blockY+1, blockZ).m_Density;
+            }
+            else
+            {
+                density[0] = m_WorldData.GetBlock(blockX, blockY, blockZ+1).IsTransparent() ? 0.0f:1.0f;
+                density[1] = m_WorldData.GetBlock(blockX+1, blockY, blockZ+1).IsTransparent() ? 0.0f:1.0f;
+                density[2] = m_WorldData.GetBlock(blockX+1, blockY, blockZ).IsTransparent() ? 0.0f:1.0f;
+                density[3] = m_WorldData.GetBlock(blockX, blockY, blockZ).IsTransparent() ? 0.0f:1.0f;
+                density[4] = m_WorldData.GetBlock(blockX, blockY+1, blockZ+1).IsTransparent() ? 0.0f:1.0f;
+                density[5] = m_WorldData.GetBlock(blockX+1, blockY+1, blockZ+1).IsTransparent() ? 0.0f:1.0f;
+                density[6] = m_WorldData.GetBlock(blockX+1, blockY+1, blockZ).IsTransparent() ? 0.0f:1.0f;
+                density[7] = m_WorldData.GetBlock(blockX, blockY+1, blockZ).IsTransparent() ? 0.0f:1.0f;
+                
+            }
             return density;
         }
 

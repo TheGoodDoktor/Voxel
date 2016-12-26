@@ -3,15 +3,12 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
-// The purpose of this class it to generate mesh for chunks
-// typically one instance wil be instantiated in the world and it will be passed a series of chunks
-// which need meshes built. As well as initially creating meshes it will also update a current chunk mesh
-
 // This is a basic builder which builds polys for externally facing block faces
 
 namespace Voxel
 {
-    public class BasicMeshBuilder : IMeshBuilder
+    [CreateAssetMenu(fileName = "BasicMeshBuilder", menuName = "Voxel/Mesh Builders/Basic", order = 1)]
+    public class BasicMeshBuilder : MeshBuilder
     {
 	    private WorldData 	m_WorldData;	// voxel world data - needed because we need to look outside current chunk
         private float       m_BlockSize;    // Size of block unit   
@@ -31,7 +28,7 @@ namespace Voxel
         }
 	
 	    // Build mesh for supplied chunk & store in internal chunk mesh data
-	    public void BuildMeshFromChunk(Chunk chunk)
+	    public override void BuildMeshFromChunk(Chunk chunk) 
 	    {
             int index = 0;
             chunk.Vertices = new List<Vector3>();
@@ -75,7 +72,7 @@ namespace Voxel
             // Check surround blocks, if they aren't transparent then they have an outside face
 
             // Bottom
-            Block block = m_WorldData.GetBlock(new IntVec3(blockX, blockY - 1, blockZ));
+            Block block = m_WorldData.GetBlock(blockX, blockY - 1, blockZ);
 
             if (block.IsTransparent() == false)
             {
@@ -86,7 +83,7 @@ namespace Voxel
             }
 
             // West
-            block = m_WorldData.GetBlock(new IntVec3(blockX - 1, blockY, blockZ));
+            block = m_WorldData.GetBlock(blockX - 1, blockY, blockZ);
             if (block.IsTransparent() == false)
             {
                 AddBlockFace(new IntVec3(x, y, z),
@@ -98,7 +95,7 @@ namespace Voxel
             }
 
             // Top
-            block = m_WorldData.GetBlock(new IntVec3(blockX, blockY + 1, blockZ));
+            block = m_WorldData.GetBlock(blockX, blockY + 1, blockZ);
             if (block.IsTransparent() == false)
             {
                 AddBlockFace(new IntVec3(x, y + 1, z),
@@ -111,7 +108,7 @@ namespace Voxel
             }
 
             // East 
-            block = m_WorldData.GetBlock(new IntVec3(blockX + 1, blockY, blockZ));
+            block = m_WorldData.GetBlock(blockX + 1, blockY, blockZ);
             if (block.IsTransparent() == false)
             {
                 AddBlockFace(new IntVec3(x + 1, y + 1,z), 
@@ -124,7 +121,7 @@ namespace Voxel
             }
 
             // North
-            block = m_WorldData.GetBlock(new IntVec3(blockX, blockY, blockZ + 1));
+            block = m_WorldData.GetBlock(blockX, blockY, blockZ + 1);
             if (block.IsTransparent() == false)
             {
                 AddBlockFace(new IntVec3(x + 1, y,z + 1), 
@@ -137,7 +134,7 @@ namespace Voxel
             }
 
             // South
-            block = m_WorldData.GetBlock(new IntVec3(blockX, blockY, blockZ - 1));
+            block = m_WorldData.GetBlock(blockX, blockY, blockZ - 1);
             if (block.IsTransparent() == false)
             {
                 AddBlockFace(new IntVec3(x, y,z),

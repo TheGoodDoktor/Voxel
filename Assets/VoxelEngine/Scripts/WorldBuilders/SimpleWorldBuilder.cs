@@ -4,15 +4,20 @@ using UnityEngine;
 
 namespace Voxel
 {
-	public class SimpleWorldBuilder : IWorldBuilder 
+    [CreateAssetMenu(fileName = "SimpleWorldBuilder", menuName = "Voxel/World Builders/Simple", order = 1)]
+	public class SimpleWorldBuilder : WorldBuilder 
 	{
-        private float[,]  m_HeightField;
-        private byte m_AirBlock = (byte)BlockType.Air;
-        private byte m_SolidBlock = (byte)BlockType.Solid;
-        private bool m_bBuildCaves = true;
+        // prperties exposed in data asset
+        private bool m_BuildCaves = true;
+        private float m_CaveThreshold = 0.2f;
+        public byte m_AirBlock = (byte)BlockType.Air;
+        public byte m_SolidBlock = (byte)BlockType.Solid;
 
+        // private data
+        private float[,]  m_HeightField;    // heightfield for landscape
+  
         // Initialise the worldbuilder by creating a heightfield
-        public void Init(WorldData world)
+        public override void Init(WorldData world)
         {
             m_HeightField = new float[world.WorldSizeBlocks.x, world.WorldSizeBlocks.z];
             int worldHeightInBlocks = world.WorldSizeBlocks.y;
@@ -35,7 +40,8 @@ namespace Voxel
             }
         }
 
-        public void BuildWorldChunk(WorldData world, Chunk chunk)
+        // build the data for a specific block in the world
+        public override void BuildWorldChunk(WorldData world, Chunk chunk)
 		{
 			IntVec3 size = world.ChunkSizeBlocks;
 
@@ -69,7 +75,7 @@ namespace Voxel
 
                 if(bUnderground)    // are we underground - check for caves
                 {
-                    if (m_bBuildCaves)
+                    if (m_BuildCaves)
                     {
                         int worldY = y + chunk.WorldPos.y;
                         float octave1 = PerlinSimplexNoise.noise(blockX * 0.009f, blockZ * 0.009f, worldY * 0.009f) * 0.25f;
@@ -77,7 +83,7 @@ namespace Voxel
                         float initialNoise = octave1 + PerlinSimplexNoise.noise(blockX * 0.04f, blockZ * 0.04f, worldY * 0.04f) * 0.15f;
                         initialNoise += PerlinSimplexNoise.noise(blockX * 0.08f, blockZ * 0.08f, worldY * 0.08f) * 0.05f;
 
-                        if (initialNoise > 0.2f)
+                        if (initialNoise > m_CaveThreshold)
                         {
                             blockType = m_AirBlock; // cave
                             density = 0;
@@ -85,14 +91,14 @@ namespace Voxel
                         else
                         {
                             // TODO: work out cave density
-                            density = 1.0f - initialNoise;
+                            //density = 1.0f - initialNoise;
                         }
                     }
 
                 }
                 else
                 {
-                    // TODO: work out above ground density
+                    // Work out above ground density
                     if(y == groundHeightInChunk)
                         density = m_HeightField[blockX, blockZ] - Mathf.Floor(m_HeightField[blockX, blockZ]);
                 }

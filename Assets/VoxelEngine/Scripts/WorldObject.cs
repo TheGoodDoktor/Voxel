@@ -12,13 +12,14 @@ namespace Voxel
         public GameObject m_ChunkPrefab;
         public BlockInfoList m_BlockInfoList;
         public bool m_TestMeshBuilder = false;
-
+        public MeshBuilder m_MeshBuilder;   // which mesh builder we want to use
+        public WorldBuilder m_WorldBuilder;   // which world builder we want to use
+        
         private WorldData m_WorldData = new WorldData();
 
         private BasicMeshBuilder m_BasicMeshBuilder;
         private MarchingCubesMeshBuilder m_MarchingCubesMeshBuilder;
-        private IMeshBuilder m_MeshBuilder;
-        private IWorldBuilder m_WorldBuilder;
+        //private IWorldBuilder m_WorldBuilder;
 
         private GameObject m_ChunkRoot;
 
@@ -92,10 +93,10 @@ namespace Voxel
         void TestFillVoxels()
         {
            // Test
-            m_WorldData.SetBlock(new IntVec3(0, 0, 0), (byte)BlockType.Solid);
-            m_WorldData.SetBlock(new IntVec3(1, 1, 1), (byte)BlockType.Solid);
-            m_WorldData.SetBlock(new IntVec3(1, 2, 1), (byte)BlockType.Solid);
-            m_WorldData.SetBlock(new IntVec3(2, 2, 2), (byte)BlockType.Solid);
+            m_WorldData.SetBlock(0, 0, 0, (byte)BlockType.Solid);
+            m_WorldData.SetBlock(1, 1, 1, (byte)BlockType.Solid);
+            m_WorldData.SetBlock(1, 2, 1, (byte)BlockType.Solid);
+            m_WorldData.SetBlock(2, 2, 2, (byte)BlockType.Solid);
         }
 
         // Handler for when new chunk is created
@@ -113,7 +114,7 @@ namespace Voxel
         // Update is called once per frame
         void Update ()
         {
-            IMeshBuilder newMeshBuilder = null;
+            MeshBuilder newMeshBuilder = null;
             if (m_TestMeshBuilder)
                 newMeshBuilder = m_MarchingCubesMeshBuilder;
             else
@@ -144,11 +145,11 @@ namespace Voxel
         {
             worldPos -= m_WorldMin; // offset from origin
 
-            return m_WorldData.GetBlock(new IntVec3(
+            return m_WorldData.GetBlock(
                 (int)(worldPos.x / m_BlockSize),
                 (int)(worldPos.y / m_BlockSize),
                 (int)(worldPos.z / m_BlockSize)
-            ));
+            );
         }
 
         
@@ -158,11 +159,11 @@ namespace Voxel
 
             Debug.Log("Setting block at: " + worldPos.ToString());
             
-            m_WorldData.SetBlock(new IntVec3(
+            m_WorldData.SetBlock(
                 (int)(worldPos.x / m_BlockSize),
                 (int)(worldPos.y / m_BlockSize),
                 (int)(worldPos.z / m_BlockSize)
-             ), blockType);
+             , blockType);
         }
 
         public Block GetBlockFromRaycastHit(RaycastHit hit)

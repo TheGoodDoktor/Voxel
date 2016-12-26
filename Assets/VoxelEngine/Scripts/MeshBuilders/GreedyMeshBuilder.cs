@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Voxel
 {
 	
-	public class GreedyMeshBuilder : IMeshBuilder 
+	public class GreedyMeshBuilder : MeshBuilder 
 	{
 		// these should go in a base class
 		private WorldData 	m_WorldData;	// voxel world data - needed because we need to look outside current chunk
@@ -21,7 +21,7 @@ namespace Voxel
 		}
 	
 		// Build mesh for supplied chunk & store in internal chunk mesh data
-		public void BuildMeshFromChunk(Chunk chunk)
+		public override void BuildMeshFromChunk(Chunk chunk)
 		{
 		}
 	}

@@ -64,10 +64,10 @@ namespace Voxel
             m_DirtyChunks.Add(chunk);
         }
 	
-	    public bool PosOutsideWorld(IntVec3 pos)
+	    public bool PosOutsideWorld(int x,int y,int z)
 	    {
-		    if(	pos.x < 0 || pos.y < 0 || pos.z < 0 || 
-			    pos.x >= m_WorldSize.x || pos.y >= m_WorldSize.y || pos.z >= m_WorldSize.z)
+		    if(	x < 0 || y < 0 || z < 0 || 
+			    x >= m_WorldSize.x || y >= m_WorldSize.y || z >= m_WorldSize.z)
 			    return true;
 			
 		    return false;
@@ -75,20 +75,22 @@ namespace Voxel
 
 	    // coords passed in air voxel world coords
 	    // air block is returned for out of world or empty chunk
-	    public Block GetBlock(IntVec3 pos)
+	    public Block GetBlock(int x,int y,int z)
         {
-		    if(PosOutsideWorld(pos))
+		    if(PosOutsideWorld(x,y,z))
             {
                 //Debug.Log("GetBlock - outside world: " + pos.ToString());
 			    return m_OutsideBlock;
             }
 		
-		    int chunkX = pos.x / m_ChunkSizeBlocks.x;
-            int chunkY = pos.y / m_ChunkSizeBlocks.y;
-            int chunkZ = pos.z / m_ChunkSizeBlocks.z;
-            int blockX = pos.x % m_ChunkSizeBlocks.x;
-            int blockY = pos.y % m_ChunkSizeBlocks.y;
-            int blockZ = pos.z % m_ChunkSizeBlocks.z;
+            // TODO: this could be sped up if chunk size were always powers of 2
+            // we could use shifts & logical AND instead of div & mod
+		    int chunkX = x / m_ChunkSizeBlocks.x;
+            int chunkY = y / m_ChunkSizeBlocks.y;
+            int chunkZ = z / m_ChunkSizeBlocks.z;
+            int blockX = x % m_ChunkSizeBlocks.x;
+            int blockY = y % m_ChunkSizeBlocks.y;
+            int blockZ = z % m_ChunkSizeBlocks.z;
 
 		    Chunk chunk = m_Chunks[chunkX, chunkY, chunkZ];
 		    if(chunk == null)
@@ -112,21 +114,21 @@ namespace Voxel
             return chunk;
         }
 
-        public void SetBlock(IntVec3 pos, byte blockType, bool bMarkDirty = true)
+        public void SetBlock(int x,int y,int z, byte blockType, bool bMarkDirty = true)
         {
-		    if(PosOutsideWorld(pos))
+		    if(PosOutsideWorld(x,y,z))
             {
-                Debug.Log("SetBlock failed point outside world: " + pos.ToString());
+                Debug.Log(string.Format("SetBlock failed point outside world: {0},{1},{2}",x,y,z));
                 return;
             }
 			  
 		    // calc chunk and block coords
-		    int chunkX = pos.x / m_ChunkSizeBlocks.x;
-            int chunkY = pos.y / m_ChunkSizeBlocks.y;
-            int chunkZ = pos.z / m_ChunkSizeBlocks.z;
-            int blockX = pos.x % m_ChunkSizeBlocks.x;
-            int blockY = pos.y % m_ChunkSizeBlocks.y;
-            int blockZ = pos.z % m_ChunkSizeBlocks.z;
+		    int chunkX = x / m_ChunkSizeBlocks.x;
+            int chunkY = y / m_ChunkSizeBlocks.y;
+            int chunkZ = z / m_ChunkSizeBlocks.z;
+            int blockX = x % m_ChunkSizeBlocks.x;
+            int blockY = y % m_ChunkSizeBlocks.y;
+            int blockZ = z % m_ChunkSizeBlocks.z;
 
 		    Chunk chunk = m_Chunks[chunkX, chunkY, chunkZ];
 
