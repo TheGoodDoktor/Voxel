@@ -12,3 +12,4 @@ MonoBehaviour:
   m_Name: MarchingCubesBuilder
   m_EditorClassIdentifier: 
   m_bUseDensities: 0
+  m_bAltDensityCalc: 1

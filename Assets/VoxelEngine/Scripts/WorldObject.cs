@@ -168,19 +168,19 @@ namespace Voxel
 
         public Block GetBlockFromRaycastHit(RaycastHit hit)
         {
-            Vector3 point = hit.point + (hit.normal * m_BlockSize * 0.5f);
+            Vector3 point = hit.point + (hit.normal * m_BlockSize * 0.01f);
             return GetBlockAt(point);
         }
 
         public void SetBlockInFrontOfRayHit(RaycastHit hit, byte blockType)
         {
-            Vector3 point = hit.point + (hit.normal * m_BlockSize * 0.5f);
+            Vector3 point = hit.point + (hit.normal * m_BlockSize * 0.01f);
             SetBlockAt(point,blockType);
         }
 
         public void SetBlockBehindRayHit(RaycastHit hit, byte blockType)
         {
-            Vector3 point = hit.point - (hit.normal * m_BlockSize * 0.5f);
+            Vector3 point = hit.point - (hit.normal * m_BlockSize * 0.01f);
             SetBlockAt(point,blockType);
         }
 

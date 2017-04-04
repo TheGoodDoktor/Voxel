@@ -6,6 +6,8 @@ public class FlyCam : MonoBehaviour {
 
 	public float m_Sensitivity = 60.0f;
 	public float m_MoveSpeed = 10.0f;
+	public GameObject m_ObjectToDrop = null;
+	public float m_PrefabThrowForce = 1.0f;
 
 	private float m_RotationX = 0;
 	private float m_RotationY = 0;
@@ -13,6 +15,7 @@ public class FlyCam : MonoBehaviour {
 
     private byte m_BlockTypeAdd = (byte)Voxel.BlockType.Solid;
     private byte m_BlockTypeRemove = (byte)Voxel.BlockType.Air;
+
 
     // Use this for initialization
     void Start () 
@@ -30,6 +33,19 @@ public class FlyCam : MonoBehaviour {
         // toggle lock/free cursor
         if (Input.GetKeyDown(KeyCode.L))
             Cursor.lockState = (Cursor.lockState == CursorLockMode.Locked) ? CursorLockMode.None : CursorLockMode.Locked;
+
+		// Drop prefab at position
+		if(Input.GetKeyDown(KeyCode.P) && m_ObjectToDrop != null)
+		{
+			GameObject newObj = Instantiate(m_ObjectToDrop,transform.position,transform.rotation) as GameObject;
+
+			Rigidbody body = newObj.GetComponent<Rigidbody>();
+			if(body != null)
+			{
+				body.AddForce(transform.forward * m_PrefabThrowForce * body.mass);
+			}
+		}
+
     }
 
     void UpdateMovementControls()

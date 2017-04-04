@@ -12,6 +12,7 @@ namespace Voxel
     public class MarchingCubesMeshBuilder : MeshBuilder
     {
         public bool m_bUseDensities = false;    // use block density values or pure voxel data
+        public bool m_bAltDensityCalc = false;
 
         private WorldData m_WorldData;  // voxel world data - needed because we need to look outside current chunk
         private float m_BlockSize = 1.0f;
@@ -65,7 +66,7 @@ namespace Voxel
 
             // Fill in block corner positions in object space
             // we offset by 0.5 because the centre of the marching cube mesh is where 8 blocks intersect
-            Vector3 offset = new Vector3(0.5f, 0.5f, 0.5f);
+            Vector3 offset = Vector3.zero;//new Vector3(0.5f, 0.5f, 0.5f);
             points[0] = (new Vector3(x+0,y+0,z+1) + offset) * m_BlockSize;
             points[1] = (new Vector3(x+1,y+0,z+1) + offset) * m_BlockSize;
             points[2] = (new Vector3(x+1,y+0,z+0) + offset) * m_BlockSize;
@@ -170,6 +171,21 @@ namespace Voxel
             return(p);
         }
 
+        float GetDensityForBlockCorner(int blockX, int blockY, int blockZ)
+        {
+            float density=0;
+            density += m_WorldData.GetBlock(blockX,     blockY, blockZ+1).IsTransparent() ? 0.0f:1.0f;
+            density += m_WorldData.GetBlock(blockX-1,   blockY, blockZ+1).IsTransparent() ? 0.0f:1.0f;
+            density += m_WorldData.GetBlock(blockX-1,   blockY, blockZ).IsTransparent() ? 0.0f:1.0f;
+            density += m_WorldData.GetBlock(blockX,     blockY, blockZ).IsTransparent() ? 0.0f:1.0f;
+            density += m_WorldData.GetBlock(blockX,     blockY+1, blockZ+1).IsTransparent() ? 0.0f:1.0f;
+            density += m_WorldData.GetBlock(blockX-1,   blockY+1, blockZ+1).IsTransparent() ? 0.0f:1.0f;
+            density += m_WorldData.GetBlock(blockX-1,   blockY+1, blockZ).IsTransparent() ? 0.0f:1.0f;
+            density += m_WorldData.GetBlock(blockX,     blockY+1, blockZ).IsTransparent() ? 0.0f:1.0f;
+                
+            return density * (1.0f/8.0f);
+        }
+
         float[] CalculateDensitiesForBlock(int blockX, int blockY, int blockZ)
         {
             float[] density = { 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -184,6 +200,17 @@ namespace Voxel
                 density[5] = m_WorldData.GetBlock(blockX+1, blockY+1, blockZ+1).m_Density;
                 density[6] = m_WorldData.GetBlock(blockX+1, blockY+1, blockZ).m_Density;
                 density[7] = m_WorldData.GetBlock(blockX, blockY+1, blockZ).m_Density;
+            }
+            else if(m_bAltDensityCalc)
+            {
+                density[0] = GetDensityForBlockCorner(blockX,   blockY,     blockZ+1);
+                density[1] = GetDensityForBlockCorner(blockX+1, blockY,     blockZ+1);
+                density[2] = GetDensityForBlockCorner(blockX+1, blockY,     blockZ);
+                density[3] = GetDensityForBlockCorner(blockX,   blockY,     blockZ);
+                density[4] = GetDensityForBlockCorner(blockX,   blockY+1,   blockZ+1);
+                density[5] = GetDensityForBlockCorner(blockX+1, blockY+1,   blockZ+1);
+                density[6] = GetDensityForBlockCorner(blockX+1, blockY+1,   blockZ);
+                density[7] = GetDensityForBlockCorner(blockX,   blockY+1,   blockZ);
             }
             else
             {
